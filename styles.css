@@ -1,0 +1,245 @@
+/* --- VARIABLES Y COLORES (Paleta SoroHub) --- */
+:root {
+    --color-sidebar: #253439;       /* Dark Slate */
+    --color-bg-hero: #B3A38E;       /* Taupe Cálido */
+    --color-bg-main: #F8F5F2;       /* Crema Suave / Bone */
+    --color-text-dark: #253439;
+    --color-text-light: #F8F5F2;
+    --color-accent: #e67e22;        /* Naranja (del logo) para botones */
+    --shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* --- RESET BÁSICO --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+}
+
+body {
+    background-color: var(--color-bg-main);
+    color: var(--color-text-dark);
+}
+
+/* --- LAYOUT PRINCIPAL (GRID / FLEX) --- */
+.dashboard-container {
+    display: flex;
+    height: 100vh; /* Ocupa toda la altura de la pantalla */
+    overflow: hidden;
+}
+
+/* --- SIDEBAR (IZQUIERDA) --- */
+.sidebar {
+    width: 260px;
+    background-color: var(--color-sidebar);
+    color: var(--color-text-light);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.brand img {
+    height: 40px;
+    margin-right: 10px;
+}
+
+.brand h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+.sidebar-menu a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #aebdc2; /* Un gris claro para items inactivos */
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    transition: 0.3s;
+}
+
+.sidebar-menu a:hover, .sidebar-menu a.active {
+    background-color: rgba(255,255,255,0.1);
+    color: white;
+}
+
+.sidebar-menu i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+.separator {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: #6c7a80;
+    padding-left: 15px;
+}
+
+.sidebar-footer {
+    margin-top: auto; /* Empuja esto al fondo */
+}
+
+/* --- CONTENIDO PRINCIPAL (DERECHA) --- */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Permite scroll si el contenido es largo */
+}
+
+/* Top Bar */
+.top-bar {
+    background-color: var(--color-sidebar); /* O blanco, según prefiráis */
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-box {
+    background-color: rgba(255,255,255,0.1);
+    padding: 8px 15px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.search-box input {
+    background: transparent;
+    border: none;
+    color: white;
+    margin-left: 10px;
+    outline: none;
+}
+
+.user-menu {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-menu a {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.user-profile img {
+    border-radius: 50%;
+}
+
+/* Hero Section (Fondo Taupe Cálido) */
+.hero-section {
+    background-color: var(--color-bg-hero);
+    padding: 40px 30px;
+    color: white; /* Texto blanco sobre el taupe para contraste */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn-primary {
+    background-color: var(--color-sidebar);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: fit-content;
+    font-weight: bold;
+    margin-top: 10px;
+    transition: 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #1a2529;
+    transform: translateY(-2px);
+}
+
+/* Grid de Tarjetas */
+.content-padding {
+    padding: 30px;
+}
+
+.content-padding h3 {
+    margin-bottom: 20px;
+    color: var(--color-sidebar);
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background-color: white; /* O var(--color-bg-main) si queréis más suave */
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    transition: 0.3s;
+    border: 1px solid #eee;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.card h4 {
+    font-size: 1.1rem;
+    color: var(--color-text-dark);
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: bold;
+}
+
+.badge-java { background-color: #ffe0b2; color: #e65100; }
+.badge-web { background-color: #bbdefb; color: #0d47a1; }
+.badge-csharp { background-color: #e1bee7; color: #4a148c; }
+
+.card p {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #888;
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+}
