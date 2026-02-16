@@ -1,0 +1,148 @@
+/* --- VARIABLES (Paleta SoroHub) --- */
+:root {
+    --color-dark: #253439;       /* Dark Slate */
+    --color-bg: #F8F5F2;         /* Crema Suave */
+    --color-accent: #e67e22;     /* Naranja vivo (para el monstruo y botón) */
+    --color-text-muted: #888;
+    --shadow-soft: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+}
+
+body {
+    background-color: var(--color-dark); /* Fondo oscuro para que resalte el login */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* --- CONTENEDOR PRINCIPAL --- */
+.login-container {
+    background-color: var(--color-bg);
+    width: 100%;
+    max-width: 400px;
+    padding: 40px 30px;
+    border-radius: 20px;
+    box-shadow: var(--shadow-soft);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+/* Título */
+.login-header h1 {
+    color: var(--color-dark);
+    font-size: 2rem;
+    margin-bottom: 25px;
+    font-weight: 700;
+}
+
+/* --- CÍRCULO DEL MONSTRUO --- */
+.monster-circle {
+    width: 130px;
+    height: 130px;
+    background-color: #fff; /* Fondo blanco para el círculo */
+    border-radius: 50%;
+    border: 4px solid var(--color-accent); /* Borde naranja */
+    margin: 0 auto 30px auto; /* Centrado horizontal y margen abajo */
+    position: relative; /* Necesario para superponer las imágenes */
+    overflow: hidden; /* Para que la imagen no se salga del círculo */
+    box-shadow: inset 0 0 20px rgba(230, 126, 34, 0.2); /* Sombra interna naranja sutil */
+}
+
+.monster-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute; /* Las colocamos una encima de otra */
+    top: 0;
+    left: 0;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease;
+}
+
+/* --- LÓGICA DEL MONSTRUO (INTERACTIVIDAD) --- */
+
+/* Estado normal: la imagen tímida está invisible */
+.img-shy {
+    opacity: 0;
+    transform: translateY(10px); /* Un pequeño efecto de movimiento */
+}
+
+/* CUANDO ESTAMOS EN MODO TÍMIDO (activado por JS) */
+/* 1. Ocultamos al monstruo normal */
+.login-container.is-shy .img-normal {
+    opacity: 0;
+}
+
+/* 2. Mostramos al monstruo tímido */
+.login-container.is-shy .img-shy {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/* --- FORMULARIO --- */
+.login-form {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--color-dark);
+    font-size: 0.9rem;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    background-color: #fff;
+    font-size: 1rem;
+    transition: 0.3s;
+}
+
+/* Al hacer click en los inputs */
+.input-group input:focus {
+    outline: none;
+    border-color: var(--color-accent); /* Borde naranja al escribir */
+    box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
+}
+
+/* Botón de Entrar */
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--color-accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-login:hover {
+    background-color: #d35400; /* Un naranja un poco más oscuro */
+    transform: translateY(-2px);
+}
+
+/* --- FOOTER --- */
+.login-footer p {
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+}
