@@ -4,46 +4,315 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cursos - SoroHub</title>
-  <link rel="stylesheet" href="estilos.css" />
-</head>
+  <link rel="stylesheet" href="css/estilos.css" />
+  <link rel="icon" type="image/png" href="imagenes/logo_blanco.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', Arial, sans-serif; }
 
+    /* ── HERO ── */
+    .hero-cursos {
+      background: linear-gradient(135deg, #0f172a 0%, #0c2a3e 50%, #1e293b 100%);
+      padding: 50px 50px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+      border-bottom: 1px solid #1e3a52;
+    }
+    .hero-cursos-texto h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .hero-cursos-texto p { color: #94a3b8; font-size: 0.95rem; }
+    .alumno-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(14,165,233,0.15);
+      border: 1px solid rgba(14,165,233,0.3);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.82rem;
+      color: #0ea5e9;
+      margin-bottom: 14px;
+    }
+    .stats-cursos {
+      display: flex;
+      gap: 16px;
+    }
+    .stat-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 16px 22px;
+      text-align: center;
+      min-width: 100px;
+      transition: 0.3s;
+    }
+    .stat-card:hover { background: rgba(14,165,233,0.1); border-color: rgba(14,165,233,0.4); }
+    .stat-valor { font-size: 1.9rem; font-weight: 800; color: #0ea5e9; display: block; }
+    .stat-label { font-size: 0.72rem; color: #64748b; margin-top: 3px; display: block; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* ── CONTROLES ── */
+    .controles-cursos {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      padding: 24px 50px;
+      background: #0f172a;
+      border-bottom: 1px solid #1e293b;
+    }
+    .filtros-tab {
+      display: flex;
+      gap: 6px;
+    }
+    .tab-btn {
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.2s;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .tab-btn:hover, .tab-btn.activo {
+      background: #0ea5e9;
+      border-color: #0ea5e9;
+      color: #fff;
+    }
+    .buscador {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 8px 14px;
+      min-width: 240px;
+      transition: 0.2s;
+    }
+    .buscador:focus-within { border-color: #0ea5e9; }
+    .buscador input {
+      background: none;
+      border: none;
+      outline: none;
+      color: #e2e8f0;
+      font-size: 0.88rem;
+      font-family: 'Inter', Arial, sans-serif;
+      width: 100%;
+    }
+    .buscador input::placeholder { color: #475569; }
+    .buscador span { color: #475569; font-size: 1rem; }
+
+    /* ── GRID DE CURSOS ── */
+    .contenedor-cursos {
+      padding: 36px 50px 60px;
+      background: #0f172a;
+    }
+    .grid-cursos {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 22px;
+    }
+    .tarjeta-curso {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      overflow: hidden;
+      transition: 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+    .tarjeta-curso:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+      border-color: #0ea5e9;
+    }
+    .curso-banner {
+      height: 8px;
+    }
+    .curso-cuerpo {
+      padding: 22px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .curso-cabecera {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .curso-icono {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+    .estado-badge {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .estado-progreso { background: rgba(14,165,233,0.2); color: #38bdf8; }
+    .estado-completado { background: rgba(34,197,94,0.2); color: #4ade80; }
+    .estado-pendiente { background: rgba(148,163,184,0.2); color: #94a3b8; }
+
+    .curso-nombre {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 5px;
+      line-height: 1.3;
+    }
+    .curso-profesor {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin-bottom: 16px;
+    }
+    .curso-meta {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .meta-item {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .barra-progreso-cont {
+      margin-bottom: 18px;
+    }
+    .barra-prog-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+    .barra-prog-fondo {
+      background: #334155;
+      border-radius: 4px;
+      height: 6px;
+      overflow: hidden;
+    }
+    .barra-prog-relleno {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.8s ease;
+    }
+    .btn-curso {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', Arial, sans-serif;
+      transition: 0.2s;
+      margin-top: auto;
+    }
+    .btn-continuar {
+      background: #0ea5e9;
+      color: #fff;
+    }
+    .btn-continuar:hover { background: #0284c7; }
+    .btn-ver {
+      background: transparent;
+      border: 1px solid #334155 !important;
+      color: #94a3b8;
+    }
+    .btn-ver:hover { background: #334155; color: #fff; }
+
+    .sin-resultados {
+      text-align: center;
+      padding: 80px;
+      color: #475569;
+      grid-column: 1/-1;
+    }
+    .sin-resultados span { font-size: 3rem; display: block; margin-bottom: 12px; }
+  </style>
+</head>
 <body>
 
 <header class="barra-superior">
-
   <div class="contenedor-logo">
-    <img src="img/logo-equipo.png" alt="Logo del equipo" class="logo-img">
+    <img src="imagenes/logo_sorohub_blanco.png" alt="Logo SoroHub" class="logo-img">
     <span class="soroHub">SoroHub</span>
   </div>
-
   <nav class="navegacion">
     <a href="SoroHub.html">Inicio</a>
     <a href="cursos.html">Cursos</a>
     <a href="tareas.html">Tareas</a>
     <a href="creadores.html">Creadores</a>
   </nav>
-
   <div class="acciones">
-    <a class="boton boton-secundario" href="login.html">Iniciar sesión</a>
-    <a class="boton boton-principal" href="login.html">Registrarse</a>
+    <a class="boton boton-secundario" href="login.html?modo=login">Iniciar sesión</a>
+    <a class="boton boton-principal" href="login.html?modo=registro">Registrarse</a>
   </div>
-
 </header>
 
 <main>
 
-  <section class="seccion-estado">
-
-    <div class="contenido-estado">
-
-      <h1>Sección de cursos en desarrollo</h1>
-      <p>Esta sección se encuentra en desarrollo por el momento</p>
-
-      <a class="boton boton-secundario" href="SoroHub.html">Volver al inicio</a>
-
+  <!-- HERO -->
+  <section class="hero-cursos">
+    <div class="hero-cursos-texto">
+      <div class="alumno-badge" id="alumno-badge">📚 Mis cursos</div>
+      <h1>Mis Cursos</h1>
+      <p>Accede a tus asignaturas, sigue tu progreso y continúa aprendiendo</p>
     </div>
-
+    <div class="stats-cursos">
+      <div class="stat-card">
+        <span class="stat-valor" id="stat-total">0</span>
+        <span class="stat-label">Matriculado</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-valor" id="stat-progreso">0</span>
+        <span class="stat-label">En progreso</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-valor" id="stat-completados">0</span>
+        <span class="stat-label">Completados</span>
+      </div>
+    </div>
   </section>
+
+  <!-- CONTROLES -->
+  <div class="controles-cursos">
+    <div class="filtros-tab" id="filtros">
+      <button class="tab-btn activo" data-filtro="todos">Todos</button>
+      <button class="tab-btn" data-filtro="En progreso">En progreso</button>
+      <button class="tab-btn" data-filtro="Completado">Completados</button>
+      <button class="tab-btn" data-filtro="Sin empezar">Sin empezar</button>
+    </div>
+    <div class="buscador">
+      <span>🔍</span>
+      <input type="text" id="buscador" placeholder="Buscar curso o asignatura…">
+    </div>
+  </div>
+
+  <!-- GRID -->
+  <div class="contenedor-cursos">
+    <div class="grid-cursos" id="gridCursos"></div>
+  </div>
 
 </main>
 
@@ -51,5 +320,138 @@
   <p>© 2026 Plataforma Educativa - Equipo de desarrollo</p>
 </footer>
 
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  // ── Datos de ejemplo ─────────────────────────────────────────────────────
+  const CURSOS = [
+    {
+      id: 1, nombre: 'Matemáticas II', profesor: 'Prof. García Martínez',
+      icono: '📐', color: '#6366f1', estado: 'En progreso',
+      progreso: 68, lecciones: 24, completadas: 16, horas: 40,
+    },
+    {
+      id: 2, nombre: 'Lengua Castellana y Literatura', profesor: 'Prof. Rodríguez López',
+      icono: '📖', color: '#ef4444', estado: 'En progreso',
+      progreso: 45, lecciones: 20, completadas: 9, horas: 35,
+    },
+    {
+      id: 3, nombre: 'Historia de España', profesor: 'Prof. Sánchez Ruiz',
+      icono: '🏛️', color: '#eab308', estado: 'Completado',
+      progreso: 100, lecciones: 18, completadas: 18, horas: 30,
+    },
+    {
+      id: 4, nombre: 'Inglés B2', profesor: 'Prof. Williams',
+      icono: '🌍', color: '#22c55e', estado: 'En progreso',
+      progreso: 30, lecciones: 22, completadas: 7, horas: 45,
+    },
+    {
+      id: 5, nombre: 'Biología y Geología', profesor: 'Prof. Fernández Díaz',
+      icono: '🔬', color: '#f97316', estado: 'Sin empezar',
+      progreso: 0, lecciones: 20, completadas: 0, horas: 38,
+    },
+    {
+      id: 6, nombre: 'Física y Química', profesor: 'Prof. Moreno Torres',
+      icono: '⚗️', color: '#0ea5e9', estado: 'Completado',
+      progreso: 100, lecciones: 26, completadas: 26, horas: 50,
+    },
+    {
+      id: 7, nombre: 'Educación Física', profesor: 'Prof. Jiménez Vega',
+      icono: '⚽', color: '#a855f7', estado: 'En progreso',
+      progreso: 80, lecciones: 10, completadas: 8, horas: 20,
+    },
+    {
+      id: 8, nombre: 'Tecnología e Informática', profesor: 'Prof. Alonso Pérez',
+      icono: '💻', color: '#14b8a6', estado: 'Sin empezar',
+      progreso: 0, lecciones: 16, completadas: 0, horas: 32,
+    },
+  ];
+
+  let filtroActual = 'todos';
+  let busqueda = '';
+
+  // ── Render ────────────────────────────────────────────────────────────────
+  function render() {
+    let datos = CURSOS.filter(c => {
+      const filtroOk = filtroActual === 'todos' || c.estado === filtroActual;
+      const busOk    = c.nombre.toLowerCase().includes(busqueda) || c.profesor.toLowerCase().includes(busqueda);
+      return filtroOk && busOk;
+    });
+
+    const grid = document.getElementById('gridCursos');
+
+    if (datos.length === 0) {
+      grid.innerHTML = `<div class="sin-resultados"><span>🔍</span>No hay cursos que coincidan con la búsqueda.</div>`;
+      return;
+    }
+
+    grid.innerHTML = datos.map(c => {
+      const estadoClass = { 'En progreso': 'estado-progreso', 'Completado': 'estado-completado', 'Sin empezar': 'estado-pendiente' }[c.estado];
+      const btnClass = c.estado === 'Sin empezar' ? 'btn-ver' : 'btn-continuar';
+      const btnTexto = c.estado === 'Completado' ? '✓ Ver curso' : c.estado === 'En progreso' ? '▶ Continuar' : '▷ Empezar';
+      const colorBarra = c.progreso === 100 ? '#22c55e' : c.progreso > 0 ? '#0ea5e9' : '#475569';
+
+      return `
+        <div class="tarjeta-curso">
+          <div class="curso-banner" style="background: ${c.color}"></div>
+          <div class="curso-cuerpo">
+            <div class="curso-cabecera">
+              <div class="curso-icono" style="background: ${c.color}22">${c.icono}</div>
+              <span class="estado-badge ${estadoClass}">${c.estado}</span>
+            </div>
+            <div class="curso-nombre">${c.nombre}</div>
+            <div class="curso-profesor">👤 ${c.profesor}</div>
+            <div class="curso-meta">
+              <span class="meta-item">📚 ${c.lecciones} lecciones</span>
+              <span class="meta-item">⏱ ${c.horas}h</span>
+            </div>
+            <div class="barra-progreso-cont">
+              <div class="barra-prog-label">
+                <span>Progreso</span>
+                <span>${c.completadas}/${c.lecciones} completadas</span>
+              </div>
+              <div class="barra-prog-fondo">
+                <div class="barra-prog-relleno" style="width:${c.progreso}%; background:${colorBarra}"></div>
+              </div>
+            </div>
+            <button class="btn-curso ${btnClass}">${btnTexto}</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ── Estadísticas ──────────────────────────────────────────────────────────
+  function actualizarStats() {
+    document.getElementById('stat-total').textContent = CURSOS.length;
+    document.getElementById('stat-progreso').textContent = CURSOS.filter(c => c.estado === 'En progreso').length;
+    document.getElementById('stat-completados').textContent = CURSOS.filter(c => c.estado === 'Completado').length;
+  }
+
+  // ── Filtros ───────────────────────────────────────────────────────────────
+  document.getElementById('filtros').addEventListener('click', e => {
+    if (!e.target.matches('.tab-btn')) return;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('activo'));
+    e.target.classList.add('activo');
+    filtroActual = e.target.dataset.filtro;
+    render();
+  });
+
+  document.getElementById('buscador').addEventListener('input', e => {
+    busqueda = e.target.value.toLowerCase();
+    render();
+  });
+
+  // ── Badge alumno ──────────────────────────────────────────────────────────
+  const sesion = SoroAPI.auth.getSession();
+  if (sesion) {
+    document.getElementById('alumno-badge').innerHTML =
+      `📚 ${sesion.nombre} ${sesion.apellidos}`;
+  }
+
+  actualizarStats();
+  render();
+</script>
 </body>
 </html>
