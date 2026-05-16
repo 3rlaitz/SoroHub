@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mis Notas - SoroHub</title>
+  <link rel="stylesheet" href="css/estilos.css" />
+  <link rel="icon" type="image/png" href="imagenes/logo_blanco.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', Arial, sans-serif; }
+
+    /* ── HERO ── */
+    .hero-notas {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0c2a3e 100%);
+      padding: 60px 50px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+      border-bottom: 1px solid #1e3a52;
+    }
+    .hero-notas-texto h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .hero-notas-texto p {
+      color: #94a3b8;
+      font-size: 1rem;
+    }
+    .hero-notas-texto .alumno-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(14,165,233,0.15);
+      border: 1px solid rgba(14,165,233,0.3);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.85rem;
+      color: #0ea5e9;
+      margin-bottom: 16px;
+    }
+    .estadisticas-rapidas {
+      display: flex;
+      gap: 20px;
+    }
+    .stat-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 18px 24px;
+      text-align: center;
+      min-width: 110px;
+      backdrop-filter: blur(10px);
+      transition: 0.3s;
+    }
+    .stat-card:hover { background: rgba(14,165,233,0.1); border-color: rgba(14,165,233,0.3); }
+    .stat-card .stat-valor {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #0ea5e9;
+      display: block;
+    }
+    .stat-card .stat-label {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* ── CONTROLES ── */
+    .controles-notas {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 28px 50px;
+      background: #0f172a;
+    }
+    .filtros {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .filtro-btn {
+      padding: 8px 18px;
+      border-radius: 20px;
+      border: 1px solid #334155;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: 0.25s;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .filtro-btn:hover, .filtro-btn.activo {
+      background: #0ea5e9;
+      border-color: #0ea5e9;
+      color: #fff;
+    }
+    .acciones-notas {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .select-orden {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #e2e8f0;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-family: 'Inter', Arial, sans-serif;
+      cursor: pointer;
+    }
+    .boton-nueva-nota {
+      background: #0ea5e9;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.25s;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .boton-nueva-nota:hover { background: #0284c7; transform: translateY(-1px); }
+
+    /* ── TABLA ── */
+    .contenedor-tabla {
+      padding: 0 50px 50px;
+      background: #0f172a;
+    }
+    .tabla-notas {
+      width: 100%;
+      border-collapse: collapse;
+      background: #1e293b;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .tabla-notas thead {
+      background: linear-gradient(90deg, #0ea5e9, #0c6fa7);
+    }
+    .tabla-notas thead th {
+      padding: 16px 20px;
+      text-align: left;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #fff;
+      font-weight: 600;
+    }
+    .tabla-notas tbody tr {
+      border-bottom: 1px solid #334155;
+      transition: 0.2s;
+    }
+    .tabla-notas tbody tr:last-child { border-bottom: none; }
+    .tabla-notas tbody tr:hover { background: rgba(14,165,233,0.06); }
+    .tabla-notas td {
+      padding: 15px 20px;
+      font-size: 0.9rem;
+      color: #e2e8f0;
+    }
+    .asignatura-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .badge-mates    { background: rgba(99,102,241,0.2); color: #818cf8; }
+    .badge-lengua   { background: rgba(239,68,68,0.2);  color: #f87171; }
+    .badge-historia { background: rgba(234,179,8,0.2);  color: #facc15; }
+    .badge-ingles   { background: rgba(34,197,94,0.2);  color: #4ade80; }
+    .badge-ciencias { background: rgba(249,115,22,0.2); color: #fb923c; }
+    .badge-otros    { background: rgba(148,163,184,0.2);color: #94a3b8; }
+
+    .nota-valor {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+    .nota-alta   { color: #4ade80; }
+    .nota-media  { color: #facc15; }
+    .nota-baja   { color: #f87171; }
+
+    .barra-nota {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .barra-fondo {
+      flex: 1;
+      height: 6px;
+      background: #334155;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .barra-relleno {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.6s ease;
+    }
+    .barra-alta   { background: linear-gradient(90deg, #22c55e, #4ade80); }
+    .barra-media  { background: linear-gradient(90deg, #eab308, #facc15); }
+    .barra-baja   { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+    .accion-eliminar {
+      background: none;
+      border: 1px solid #ef4444;
+      color: #ef4444;
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      transition: 0.2s;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .accion-eliminar:hover { background: #ef4444; color: #fff; }
+
+    .sin-notas {
+      text-align: center;
+      padding: 60px;
+      color: #475569;
+    }
+    .sin-notas span { font-size: 3rem; display: block; margin-bottom: 12px; }
+
+    /* ── MODAL ── */
+    .overlay-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .overlay-modal.visible { display: flex; }
+    .modal {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 36px;
+      width: 100%;
+      max-width: 450px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+      animation: modalEntrada 0.3s ease;
+    }
+    @keyframes modalEntrada {
+      from { opacity: 0; transform: translateY(-20px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .modal h2 { font-size: 1.3rem; margin-bottom: 24px; color: #fff; }
+    .campo-form {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+    .campo-form label { font-size: 0.82rem; color: #94a3b8; font-weight: 500; }
+    .campo-form input,
+    .campo-form select {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      color: #e2e8f0;
+      padding: 10px 14px;
+      font-size: 0.9rem;
+      font-family: 'Inter', Arial, sans-serif;
+      transition: 0.2s;
+    }
+    .campo-form input:focus,
+    .campo-form select:focus {
+      outline: none;
+      border-color: #0ea5e9;
+      box-shadow: 0 0 0 3px rgba(14,165,233,0.15);
+    }
+    .modal-acciones {
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+    }
+    .boton-guardar {
+      flex: 1;
+      background: #0ea5e9;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .boton-guardar:hover { background: #0284c7; }
+    .boton-cancelar {
+      flex: 1;
+      background: transparent;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: 0.2s;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .boton-cancelar:hover { background: #334155; color: #fff; }
+  </style>
+</head>
+<body>
+
+<header class="barra-superior">
+  <div class="contenedor-logo">
+    <img src="imagenes/logo_sorohub_blanco.png" alt="Logo SoroHub" class="logo-img">
+    <span class="soroHub">SoroHub</span>
+  </div>
+  <nav class="navegacion">
+    <a href="SoroHub.html">Inicio</a>
+    <a href="cursos.html">Cursos</a>
+    <a href="tareas.html">Tareas</a>
+    <a href="creadores.html">Creadores</a>
+  </nav>
+  <div class="acciones">
+    <a class="boton boton-secundario" href="login.html?modo=login">Iniciar sesión</a>
+    <a class="boton boton-principal" href="login.html?modo=registro">Registrarse</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero-notas">
+    <div class="hero-notas-texto">
+      <div class="alumno-badge" id="alumno-badge">👤 Alumno: <strong id="nombre-alumno">Invitado</strong></div>
+      <h1>📊 Mis Notas</h1>
+      <p>Consulta y gestiona tu seguimiento académico por asignatura</p>
+    </div>
+    <div class="estadisticas-rapidas">
+      <div class="stat-card">
+        <span class="stat-valor" id="stat-media">—</span>
+        <span class="stat-label">Media general</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-valor" id="stat-total">0</span>
+        <span class="stat-label">Evaluaciones</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-valor" id="stat-mejor">—</span>
+        <span class="stat-label">Mejor nota</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTROLES -->
+  <div class="controles-notas">
+    <div class="filtros" id="filtros">
+      <button class="filtro-btn activo" data-filtro="todas">Todas</button>
+      <button class="filtro-btn" data-filtro="Matemáticas">Matemáticas</button>
+      <button class="filtro-btn" data-filtro="Lengua">Lengua</button>
+      <button class="filtro-btn" data-filtro="Historia">Historia</button>
+      <button class="filtro-btn" data-filtro="Inglés">Inglés</button>
+      <button class="filtro-btn" data-filtro="Ciencias">Ciencias</button>
+    </div>
+    <div class="acciones-notas">
+      <select class="select-orden" id="selectOrden">
+        <option value="fecha-desc">Más recientes primero</option>
+        <option value="fecha-asc">Más antiguas primero</option>
+        <option value="nota-desc">Mayor nota primero</option>
+        <option value="nota-asc">Menor nota primero</option>
+        <option value="asignatura">Por asignatura</option>
+      </select>
+      <button class="boton-nueva-nota" id="btnNuevaNota">＋ Añadir nota</button>
+    </div>
+  </div>
+
+  <!-- TABLA -->
+  <div class="contenedor-tabla">
+    <table class="tabla-notas">
+      <thead>
+        <tr>
+          <th>Asignatura</th>
+          <th>Evaluación / Examen</th>
+          <th>Fecha</th>
+          <th>Nota</th>
+          <th>Progreso</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="cuerpoTabla">
+        <!-- Filas generadas por JS -->
+      </tbody>
+    </table>
+  </div>
+
+</main>
+
+<!-- MODAL -->
+<div class="overlay-modal" id="overlayModal">
+  <div class="modal">
+    <h2>✏️ Añadir nueva nota</h2>
+    <div class="campo-form">
+      <label for="inputAsignatura">Asignatura</label>
+      <select id="inputAsignatura">
+        <option value="Matemáticas">Matemáticas</option>
+        <option value="Lengua">Lengua</option>
+        <option value="Historia">Historia</option>
+        <option value="Inglés">Inglés</option>
+        <option value="Ciencias">Ciencias</option>
+        <option value="Otros">Otros</option>
+      </select>
+    </div>
+    <div class="campo-form">
+      <label for="inputEvaluacion">Evaluación / Examen</label>
+      <input type="text" id="inputEvaluacion" placeholder="Ej: Examen Tema 3, Redacción...">
+    </div>
+    <div class="campo-form">
+      <label for="inputFecha">Fecha</label>
+      <input type="date" id="inputFecha">
+    </div>
+    <div class="campo-form">
+      <label for="inputNota">Nota (0 – 10)</label>
+      <input type="number" id="inputNota" min="0" max="10" step="0.1" placeholder="Ej: 8.5">
+    </div>
+    <div class="modal-acciones">
+      <button class="boton-cancelar" id="btnCancelar">Cancelar</button>
+      <button class="boton-guardar" id="btnGuardar">Guardar nota</button>
+    </div>
+  </div>
+</div>
+
+<footer class="pie-pagina">
+  <p>© 2026 Plataforma Educativa - Equipo de desarrollo</p>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  // ── Estado local (caché de notas cargadas desde SoroAPI) ────────────────
+  let notas = [];
+  let filtroActual = 'todas';
+
+  // ── Utilidades ───────────────────────────────────────────────────────────
+  function claseBadge(asig) {
+    const mapa = { 'Matemáticas':'mates','Lengua':'lengua','Historia':'historia','Inglés':'ingles','Ciencias':'ciencias' };
+    return 'asignatura-badge badge-' + (mapa[asig] || 'otros');
+  }
+  function claseNota(n) {
+    if (n >= 7) return 'nota-alta';
+    if (n >= 5) return 'nota-media';
+    return 'nota-baja';
+  }
+  function claseBarra(n) {
+    if (n >= 7) return 'barra-alta';
+    if (n >= 5) return 'barra-media';
+    return 'barra-baja';
+  }
+  function formatFecha(f) {
+    const [y,m,d] = f.split('-');
+    return `${d}/${m}/${y}`;
+  }
+
+  // ── Renderizado ──────────────────────────────────────────────────────────
+  function renderizar() {
+    const orden = document.getElementById('selectOrden').value;
+    let datos = filtroActual === 'todas' ? [...notas] : notas.filter(n => n.asignatura === filtroActual);
+
+    datos.sort((a, b) => {
+      if (orden === 'fecha-desc')  return b.fecha.localeCompare(a.fecha);
+      if (orden === 'fecha-asc')   return a.fecha.localeCompare(b.fecha);
+      if (orden === 'nota-desc')   return b.nota - a.nota;
+      if (orden === 'nota-asc')    return a.nota - b.nota;
+      if (orden === 'asignatura')  return a.asignatura.localeCompare(b.asignatura);
+      return 0;
+    });
+
+    const tbody = document.getElementById('cuerpoTabla');
+    if (datos.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6"><div class="sin-notas"><span>📭</span>No hay notas registradas para esta asignatura.</div></td></tr>`;
+    } else {
+      tbody.innerHTML = datos.map(n => `
+        <tr>
+          <td><span class="${claseBadge(n.asignatura)}">${n.asignatura}</span></td>
+          <td>${n.evaluacion}</td>
+          <td>${formatFecha(n.fecha)}</td>
+          <td><span class="nota-valor ${claseNota(n.nota)}">${n.nota.toFixed(1)}</span></td>
+          <td>
+            <div class="barra-nota">
+              <div class="barra-fondo">
+                <div class="barra-relleno ${claseBarra(n.nota)}" style="width:${n.nota * 10}%"></div>
+              </div>
+            </div>
+          </td>
+          <td><button class="accion-eliminar" onclick="eliminar(${n.id})">✕ Eliminar</button></td>
+        </tr>
+      `).join('');
+    }
+
+    // Estadísticas
+    const media = notas.length ? (notas.reduce((s,n) => s + n.nota, 0) / notas.length).toFixed(2) : '—';
+    const mejor = notas.length ? Math.max(...notas.map(n => n.nota)).toFixed(1) : '—';
+    document.getElementById('stat-media').textContent = media;
+    document.getElementById('stat-total').textContent = notas.length;
+    document.getElementById('stat-mejor').textContent = mejor;
+  }
+
+  // ── Filtros / Orden ──────────────────────────────────────────────────────
+  document.getElementById('filtros').addEventListener('click', e => {
+    if (!e.target.matches('.filtro-btn')) return;
+    document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('activo'));
+    e.target.classList.add('activo');
+    filtroActual = e.target.dataset.filtro;
+    renderizar();
+  });
+  document.getElementById('selectOrden').addEventListener('change', renderizar);
+
+  // ── Eliminar nota ────────────────────────────────────────────────────────
+  async function eliminar(id) {
+    await SoroAPI.notas.delete(id);
+    notas = notas.filter(n => n.id !== id);
+    renderizar();
+  }
+
+  // ── Modal ────────────────────────────────────────────────────────────────
+  const overlay = document.getElementById('overlayModal');
+  document.getElementById('btnNuevaNota').addEventListener('click', () => {
+    document.getElementById('inputFecha').value = new Date().toISOString().slice(0,10);
+    overlay.classList.add('visible');
+  });
+  document.getElementById('btnCancelar').addEventListener('click', () => overlay.classList.remove('visible'));
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('visible'); });
+
+  document.getElementById('btnGuardar').addEventListener('click', async () => {
+    const asig  = document.getElementById('inputAsignatura').value;
+    const eval_ = document.getElementById('inputEvaluacion').value.trim();
+    const fecha = document.getElementById('inputFecha').value;
+    const nota  = parseFloat(document.getElementById('inputNota').value);
+
+    if (!eval_ || !fecha || isNaN(nota) || nota < 0 || nota > 10) {
+      alert('Por favor, completa todos los campos correctamente (nota entre 0 y 10).');
+      return;
+    }
+
+    const res = await SoroAPI.notas.add(asig, eval_, fecha, nota);
+    if (res.ok) {
+      notas.push(res.nota);
+      document.getElementById('inputEvaluacion').value = '';
+      document.getElementById('inputNota').value = '';
+      overlay.classList.remove('visible');
+      filtroActual = 'todas';
+      document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('activo'));
+      document.querySelector('[data-filtro="todas"]').classList.add('activo');
+      renderizar();
+    }
+  });
+
+  // ── Nombre del alumno en el hero ─────────────────────────────────────────
+  const sesion = SoroAPI.auth.getSession();
+  if (sesion) {
+    document.getElementById('nombre-alumno').textContent = sesion.nombre + ' ' + sesion.apellidos;
+  }
+
+  // ── Inicializar: carga notas desde SoroAPI ───────────────────────────────
+  (async function init() {
+    notas = await SoroAPI.notas.getAll();
+    renderizar();
+  })();
+</script>
+</body>
+</html>
