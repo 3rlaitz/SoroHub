@@ -55,14 +55,7 @@
 
   <!-- CONTROLES -->
   <div class="controles-notas">
-    <div class="filtros" id="filtros">
-      <button class="filtro-btn activo" data-filtro="todas">Todas</button>
-      <button class="filtro-btn" data-filtro="Matemáticas">Matemáticas</button>
-      <button class="filtro-btn" data-filtro="Lengua">Lengua</button>
-      <button class="filtro-btn" data-filtro="Historia">Historia</button>
-      <button class="filtro-btn" data-filtro="Inglés">Inglés</button>
-      <button class="filtro-btn" data-filtro="Ciencias">Ciencias</button>
-    </div>
+    <div id="filtros" style="display:none;"></div>
     <div class="acciones-notas">
       <select class="select-orden" id="selectOrden">
         <option value="fecha-desc">Más recientes primero</option>
@@ -102,14 +95,7 @@
     <h2>✏️ Añadir nueva nota</h2>
     <div class="campo-form">
       <label for="inputAsignatura">Asignatura</label>
-      <select id="inputAsignatura">
-        <option value="Matemáticas">Matemáticas</option>
-        <option value="Lengua">Lengua</option>
-        <option value="Historia">Historia</option>
-        <option value="Inglés">Inglés</option>
-        <option value="Ciencias">Ciencias</option>
-        <option value="Otros">Otros</option>
-      </select>
+      <input type="text" id="inputAsignatura" placeholder="Ej: Matemáticas, Ciencias...">
     </div>
     <div class="campo-form">
       <label for="inputEvaluacion">Evaluación / Examen</label>

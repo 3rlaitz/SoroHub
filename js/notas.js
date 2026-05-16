@@ -4,8 +4,10 @@
 
   // ── Utilidades ───────────────────────────────────────────────────────────
   function claseBadge(asig) {
-    const mapa = { 'Matemáticas':'mates','Lengua':'lengua','Historia':'historia','Inglés':'ingles','Ciencias':'ciencias' };
-    return 'asignatura-badge badge-' + (mapa[asig] || 'otros');
+    if (!asig) asig = "Otros";
+    const charCode = asig.charCodeAt(0) || 0;
+    const classes = ['badge-mates', 'badge-lengua', 'badge-historia', 'badge-ingles', 'badge-ciencias', 'badge-otros'];
+    return 'asignatura-badge ' + classes[charCode % classes.length];
   }
   function claseNota(n) {
     if (n >= 7) return 'nota-alta';
@@ -25,7 +27,7 @@
   // ── Renderizado ──────────────────────────────────────────────────────────
   function renderizar() {
     const orden = document.getElementById('selectOrden').value;
-    let datos = filtroActual === 'todas' ? [...notas] : notas.filter(n => n.asignatura === filtroActual);
+    let datos = [...notas];
 
     datos.sort((a, b) => {
       if (orden === 'fecha-desc')  return b.fecha.localeCompare(a.fecha);
@@ -66,14 +68,7 @@
     document.getElementById('stat-mejor').textContent = mejor;
   }
 
-  // ── Filtros / Orden ──────────────────────────────────────────────────────
-  document.getElementById('filtros').addEventListener('click', e => {
-    if (!e.target.matches('.filtro-btn')) return;
-    document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('activo'));
-    e.target.classList.add('activo');
-    filtroActual = e.target.dataset.filtro;
-    renderizar();
-  });
+  // ── Orden ──────────────────────────────────────────────────────
   document.getElementById('selectOrden').addEventListener('change', renderizar);
 
   // ── Eliminar nota ────────────────────────────────────────────────────────
@@ -109,9 +104,6 @@
       document.getElementById('inputEvaluacion').value = '';
       document.getElementById('inputNota').value = '';
       overlay.classList.remove('visible');
-      filtroActual = 'todas';
-      document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('activo'));
-      document.querySelector('[data-filtro="todas"]').classList.add('activo');
       renderizar();
     }
   });
