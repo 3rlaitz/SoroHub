@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Plataforma Educativa - SoroHub</title>
-  <link rel="stylesheet" href="estilos.css" />
+  <link rel="stylesheet" href="css/estilos.css" />
+  <link rel="icon" type="image/png" href="imagenes/logo_blanco.png">
 </head>
 
 <body>
@@ -12,7 +13,7 @@
 <header class="barra-superior">
 
   <div class="contenedor-logo">
-    <img src="img/logo-equipo.png" alt="Logo del equipo" class="logo-img">
+    <img src="imagenes/logo_sorohub_blanco.png" alt="Logo del equipo" class="logo-img">
     <span class="soroHub">SoroHub</span>
   </div>
 
@@ -24,8 +25,8 @@
   </nav>
 
   <div class="acciones">
-    <a class="boton boton-secundario" href="login.html">Iniciar sesión</a>
-    <a class="boton boton-principal" href="login.html">Registrarse</a>
+    <a class="boton boton-secundario" href="login.html?modo=login">Iniciar sesión</a>
+    <a class="boton boton-principal" href="login.html?modo=registro">Registrarse</a>
   </div>
 
 </header>
@@ -44,23 +45,23 @@
 
   <section class="seccion-tarjetas">
 
-    <div class="tarjeta">
+    <a href="cursos.html" class="tarjeta">
       <img src="imagenes/cursos.png" alt="Cursos" class="icono-tarjeta">
       <h3>Cursos</h3>
       <p>Accede a todas tus asignaturas</p>
-    </div>
+    </a>
 
-    <div class="tarjeta">
+    <a href="tareas.html" class="tarjeta">
       <img src="imagenes/tareas.png" alt="Tareas" class="icono-tarjeta">
       <h3>Tareas</h3>
       <p>Entrega y revisa trabajos fácilmente</p>
-    </div>
+    </a>
 
-    <div class="tarjeta">
+    <a href="notas.html" class="tarjeta">
       <img src="imagenes/notas.png" alt="Notas" class="icono-tarjeta">
       <h3>Notas</h3>
       <p>Consulta tu progreso académico</p>
-    </div>
+    </a>
 
   </section>
 
@@ -70,5 +71,8 @@
   <p>© 2026 Plataforma Educativa - Equipo de desarrollo</p>
 </footer>
 
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
 </body>
 </html>
