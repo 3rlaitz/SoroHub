@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plataforma Educativa - SoroHub</title>
+  <link rel="stylesheet" href="css/estilos.css" />
+  <link rel="icon" type="image/png" href="imagenes/logo_blanco.png">
+</head>
+
+<body>
+
+<header class="barra-superior">
+
+  <a href="SoroHub.html" class="contenedor-logo">
+    <img src="imagenes/logo_sorohub_blanco.png" alt="Logo del equipo" class="logo-img">
+    <span class="soroHub">SoroHub</span>
+  </a>
+
+  <nav class="navegacion">
+    <a href="SoroHub.html">Inicio</a>
+    <a href="recursos.html">Recursos</a>
+    <a href="tareas.html">Tareas</a>
+    <a href="creadores.html">Creadores</a>
+  </nav>
+
+  <div class="acciones">
+    <a class="boton boton-secundario" href="login.html?modo=login">Iniciar sesión</a>
+    <a class="boton boton-principal" href="login.html?modo=registro">Registrarse</a>
+  </div>
+
+</header>
+
+<main>
+
+  <section class="seccion-hero">
+
+    <div class="contenido-hero-grid">
+      <div class="hero-texto">
+        <h1>Aprende.<br>Entrega.<br>Mejora.</h1>
+        <p>Tu espacio educativo para gestionar cursos, tareas y progreso académico</p>
+        <div class="hero-botones" id="hero-botones">
+          <a class="boton boton-principal btn-grande" id="btn-empezar" href="login.html?modo=login">Empezar a aprender</a>
+          <!-- <a class="boton boton-secundario btn-grande" href="login.html?modo=registro">Crear cuenta</a> -->
+        </div>
+      </div>
+      <div class="hero-imagen">
+        <img src="imagenes/logo_blanco.png" alt="SoroHub Logo" class="logo-hero-animado">
+      </div>
+    </div>
+
+  </section>
+
+  <section class="seccion-tarjetas">
+
+    <a href="recursos.html" class="tarjeta">
+      <img src="imagenes/cursos.png" alt="Recursos" class="icono-tarjeta">
+      <h3>Recursos</h3>
+      <p>Sube y comparte documentos y apuntes</p>
+    </a>
+
+    <a href="tareas.html" class="tarjeta">
+      <img src="imagenes/tareas.png" alt="Tareas" class="icono-tarjeta">
+      <h3>Tareas</h3>
+      <p>Entrega y revisa trabajos fácilmente</p>
+    </a>
+
+    <a href="notas.html" class="tarjeta">
+      <img src="imagenes/notas.png" alt="Notas" class="icono-tarjeta">
+      <h3>Notas</h3>
+      <p>Consulta tu progreso académico</p>
+    </a>
+
+  </section>
+
+</main>
+
+<footer class="pie-pagina">
+  <p>© 2026 Plataforma Educativa - Equipo de desarrollo</p>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  // Ocultar los botones del hero si el usuario ya ha iniciado sesión
+  if (SoroAPI.auth.getSession()) {
+    document.getElementById('hero-botones').style.display = 'none';
+  }
+</script>
+</body>
+</html>

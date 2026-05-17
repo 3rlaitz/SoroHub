@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recursos - SoroHub</title>
+  <link rel="stylesheet" href="css/estilos.css" />
+  <link rel="icon" type="image/png" href="imagenes/logo_blanco.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/recursos.css" />
+</head>
+<body>
+
+<header class="barra-superior">
+  <a href="SoroHub.html" class="contenedor-logo">
+    <img src="imagenes/logo_sorohub_blanco.png" alt="Logo SoroHub" class="logo-img">
+    <span class="soroHub">SoroHub</span>
+  </a>
+  <nav class="navegacion">
+    <a href="SoroHub.html">Inicio</a>
+    <a href="recursos.html">Recursos</a>
+    <a href="tareas.html">Tareas</a>
+    <a href="creadores.html">Creadores</a>
+  </nav>
+  <div class="acciones">
+    <a class="boton boton-secundario" href="login.html?modo=login">Iniciar sesión</a>
+    <a class="boton boton-principal" href="login.html?modo=registro">Registrarse</a>
+  </div>
+</header>
+
+<main>
+  <!-- CONTENIDO PRINCIPAL -->
+  <div id="contenidoPrincipal">
+    <!-- HERO -->
+    <section class="hero-recursos">
+      <div class="hero-recursos-texto">
+        <div class="alumno-badge" id="alumno-badge">📂 Repositorio compartido</div>
+        <h1>Recursos Educativos</h1>
+        <p>Comparte tus trabajos, apuntes y proyectos con otros compañeros de la plataforma.</p>
+      </div>
+      <div class="stats-recursos">
+        <button class="boton-subir" id="btnSubirRecurso">＋ Subir Recurso</button>
+      </div>
+    </section>
+
+    <!-- GRID -->
+    <div class="contenedor-recursos">
+      <div class="grid-recursos" id="gridRecursos"></div>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL PARA SUBIR RECURSO -->
+<div class="overlay-modal" id="modalSubir">
+  <div class="modal">
+    <h2>Subir nuevo recurso</h2>
+    <div class="campo-form">
+      <label>Título del archivo</label>
+      <input type="text" id="inputTitulo" placeholder="Ej: Apuntes Tema 4 - Historia">
+    </div>
+    <div class="campo-form">
+      <label>Descripción corta</label>
+      <input type="text" id="inputDesc" placeholder="¿De qué trata este recurso?">
+    </div>
+    <div class="campo-form">
+      <label>Archivo (Simulado)</label>
+      <input type="file" id="inputFile">
+    </div>
+    <div class="modal-acciones">
+      <button class="btn-m btn-cancelar" id="btnCancelarSubir">Cancelar</button>
+      <button class="btn-m btn-guardar" id="btnGuardarRecurso">Publicar</button>
+    </div>
+  </div>
+</div>
+
+<footer class="pie-pagina">
+  <p>© 2026 Plataforma Educativa - Equipo de desarrollo</p>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/recursos.js"></script>
+</body>
+</html>

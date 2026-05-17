@@ -1,0 +1,309 @@
+    body { font-family: 'Inter', Arial, sans-serif; }
+
+    /* ── HERO ── */
+    .hero-notas {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0c2a3e 100%);
+      padding: 60px 50px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+      border-bottom: 1px solid #1e3a52;
+    }
+    .hero-notas-texto h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .hero-notas-texto p {
+      color: #94a3b8;
+      font-size: 1rem;
+    }
+    .hero-notas-texto .alumno-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(14,165,233,0.15);
+      border: 1px solid rgba(14,165,233,0.3);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.85rem;
+      color: #0ea5e9;
+      margin-bottom: 16px;
+    }
+    .estadisticas-rapidas {
+      display: flex;
+      gap: 20px;
+    }
+    .stat-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 18px 24px;
+      text-align: center;
+      min-width: 110px;
+      backdrop-filter: blur(10px);
+      transition: 0.3s;
+    }
+    .stat-card:hover { background: rgba(14,165,233,0.1); border-color: rgba(14,165,233,0.3); }
+    .stat-card .stat-valor {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #0ea5e9;
+      display: block;
+    }
+    .stat-card .stat-label {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* ── CONTROLES ── */
+    .controles-notas {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 28px 50px;
+      background: #0f172a;
+    }
+    .filtros {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .filtro-btn {
+      padding: 8px 18px;
+      border-radius: 20px;
+      border: 1px solid #334155;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: 0.25s;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .filtro-btn:hover, .filtro-btn.activo {
+      background: #0ea5e9;
+      border-color: #0ea5e9;
+      color: #fff;
+    }
+    .acciones-notas {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .select-orden {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #e2e8f0;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-family: 'Inter', Arial, sans-serif;
+      cursor: pointer;
+    }
+    .boton-nueva-nota {
+      background: #0ea5e9;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.25s;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .boton-nueva-nota:hover { background: #0284c7; transform: translateY(-1px); }
+
+    /* ── TABLA ── */
+    .contenedor-tabla {
+      padding: 0 50px 50px;
+      background: #0f172a;
+    }
+    .tabla-notas {
+      width: 100%;
+      border-collapse: collapse;
+      background: #1e293b;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .tabla-notas thead {
+      background: linear-gradient(90deg, #0ea5e9, #0c6fa7);
+    }
+    .tabla-notas thead th {
+      padding: 16px 20px;
+      text-align: left;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #fff;
+      font-weight: 600;
+    }
+    .tabla-notas tbody tr {
+      border-bottom: 1px solid #334155;
+      transition: 0.2s;
+    }
+    .tabla-notas tbody tr:last-child { border-bottom: none; }
+    .tabla-notas tbody tr:hover { background: rgba(14,165,233,0.06); }
+    .tabla-notas td {
+      padding: 15px 20px;
+      font-size: 0.9rem;
+      color: #e2e8f0;
+    }
+    .asignatura-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .badge-mates    { background: rgba(99,102,241,0.2); color: #818cf8; }
+    .badge-lengua   { background: rgba(239,68,68,0.2);  color: #f87171; }
+    .badge-historia { background: rgba(234,179,8,0.2);  color: #facc15; }
+    .badge-ingles   { background: rgba(34,197,94,0.2);  color: #4ade80; }
+    .badge-ciencias { background: rgba(249,115,22,0.2); color: #fb923c; }
+    .badge-otros    { background: rgba(148,163,184,0.2);color: #94a3b8; }
+
+    .nota-valor {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+    .nota-alta   { color: #4ade80; }
+    .nota-media  { color: #facc15; }
+    .nota-baja   { color: #f87171; }
+
+    .barra-nota {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .barra-fondo {
+      flex: 1;
+      height: 6px;
+      background: #334155;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .barra-relleno {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.6s ease;
+    }
+    .barra-alta   { background: linear-gradient(90deg, #22c55e, #4ade80); }
+    .barra-media  { background: linear-gradient(90deg, #eab308, #facc15); }
+    .barra-baja   { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+    .accion-eliminar {
+      background: none;
+      border: 1px solid #ef4444;
+      color: #ef4444;
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      transition: 0.2s;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .accion-eliminar:hover { background: #ef4444; color: #fff; }
+
+    .sin-notas {
+      text-align: center;
+      padding: 60px;
+      color: #475569;
+    }
+    .sin-notas span { font-size: 3rem; display: block; margin-bottom: 12px; }
+
+    /* ── MODAL ── */
+    .overlay-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .overlay-modal.visible { display: flex; }
+    .modal {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 36px;
+      width: 100%;
+      max-width: 450px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+      animation: modalEntrada 0.3s ease;
+    }
+    @keyframes modalEntrada {
+      from { opacity: 0; transform: translateY(-20px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .modal h2 { font-size: 1.3rem; margin-bottom: 24px; color: #fff; }
+    .campo-form {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+    .campo-form label { font-size: 0.82rem; color: #94a3b8; font-weight: 500; }
+    .campo-form input,
+    .campo-form select {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      color: #e2e8f0;
+      padding: 10px 14px;
+      font-size: 0.9rem;
+      font-family: 'Inter', Arial, sans-serif;
+      transition: 0.2s;
+    }
+    .campo-form input:focus,
+    .campo-form select:focus {
+      outline: none;
+      border-color: #0ea5e9;
+      box-shadow: 0 0 0 3px rgba(14,165,233,0.15);
+    }
+    .modal-acciones {
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+    }
+    .boton-guardar {
+      flex: 1;
+      background: #0ea5e9;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .boton-guardar:hover { background: #0284c7; }
+    .boton-cancelar {
+      flex: 1;
+      background: transparent;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: 0.2s;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .boton-cancelar:hover { background: #334155; color: #fff; }

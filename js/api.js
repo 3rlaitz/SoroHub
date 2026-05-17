@@ -1,0 +1,279 @@
+// ═══════════════════════════════════════════════════════════════════════════
+//  SOROHUB – CAPA DE API
+//  Centraliza TODAS las llamadas a datos de la aplicación.
+//
+//  ┌─────────────────────────────────────────────────────────────────────┐
+//  │  CÓMO CONECTAR LA BASE DE DATOS (pasos para el compañero)           │
+//  │                                                                     │
+//  │  1. Abre config.js y pon:  USE_MOCK: false                          │
+//  │  2. En config.js ajusta:   API_BASE_URL a la URL de tu servidor     │
+//  │  3. Aquí, descomenta los bloques [REAL API] de cada función         │
+//  │  4. Comenta (o elimina) los bloques [MOCK] correspondientes         │
+//  │                                                                     │
+//  │  Los endpoints esperados se documentan en cada función.             │
+//  └─────────────────────────────────────────────────────────────────────┘
+//
+//  Depende de: config.js  (debe cargarse antes que este archivo)
+// ═══════════════════════════════════════════════════════════════════════════
+
+const SoroAPI = (() => {
+
+  const BASE = SoroConfig.API_BASE_URL;
+  const MOCK = SoroConfig.USE_MOCK;
+
+  // ── Claves de localStorage (solo se usan en modo mock) ─────────────────
+  const KEYS = {
+    session : 'sorohub_session',
+    users   : 'sorohub_users',
+    notes   : 'sorohub_notes',
+  };
+
+  // ── Helpers de localStorage ─────────────────────────────────────────────
+  function mockGet(key, def = null) {
+    try { return JSON.parse(localStorage.getItem(key)) ?? def; }
+    catch { return def; }
+  }
+  function mockSet(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
+  function mockDel(key)      { localStorage.removeItem(key); }
+
+  // ── Helper de fetch para la API real ───────────────────────────────────
+  // Añade cabeceras JSON y gestiona errores HTTP.
+  async function fetchJSON(endpoint, options = {}) {
+    const res = await fetch(BASE + endpoint, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+      credentials: 'include',   // envía cookies de sesión (si el servidor las usa)
+      ...options,
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.message || `Error ${res.status}: ${res.statusText}`);
+    }
+    return res.json();
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  //  AUTH
+  //  Rutas esperadas en el servidor:
+  //    POST /api/auth/login    { email, password }  → { ok, user }
+  //    POST /api/auth/register { nombre, apellidos, email, password } → { ok, user }
+  //    POST /api/auth/logout   (sin body)           → { ok }
+  // ═══════════════════════════════════════════════════════════════════════
+  const auth = {
+
+    async login(email, password) {
+      if (MOCK) {
+        // ── [MOCK] ───────────────────────────────────────────────────────
+        const users = mockGet(KEYS.users, []);
+        const user  = users.find(u => u.email === email && u.password === password);
+        if (!user) return { ok: false, message: 'Credenciales incorrectas' };
+        const { password: _, ...safe } = user;   // no guardamos la contraseña en sesión
+        mockSet(KEYS.session, safe);
+        return { ok: true, user: safe };
+        // ── [MOCK] ───────────────────────────────────────────────────────
+      }
+
+      // ── [REAL API] ───────────────────────────────────────────────────────
+      // try {
+      //   const data = await fetchJSON('/auth/login', {
+      //     method: 'POST',
+      //     body: JSON.stringify({ email, password }),
+      //   });
+      //   mockSet(KEYS.session, data.user);   // cachea la sesión en localStorage
+      //   return { ok: true, user: data.user };
+      // } catch (e) {
+      //   return { ok: false, message: e.message };
+      // }
+      // ── [REAL API] ───────────────────────────────────────────────────────
+    },
+
+    async register(nombre, apellidos, email, password) {
+      if (MOCK) {
+        // ── [MOCK] ───────────────────────────────────────────────────────
+        const users = mockGet(KEYS.users, []);
+        if (users.find(u => u.email === email))
+          return { ok: false, message: 'El correo ya está registrado' };
+        const newUser = { nombre, apellidos, email, password };
+        users.push(newUser);
+        mockSet(KEYS.users, users);
+        const { password: _, ...safe } = newUser;
+        mockSet(KEYS.session, safe);
+        return { ok: true, user: safe };
+        // ── [MOCK] ───────────────────────────────────────────────────────
+      }
+
+      // ── [REAL API] ───────────────────────────────────────────────────────
+      // try {
+      //   const data = await fetchJSON('/auth/register', {
+      //     method: 'POST',
+      //     body: JSON.stringify({ nombre, apellidos, email, password }),
+      //   });
+      //   mockSet(KEYS.session, data.user);
+      //   return { ok: true, user: data.user };
+      // } catch (e) {
+      //   return { ok: false, message: e.message };
+      // }
+      // ── [REAL API] ───────────────────────────────────────────────────────
+    },
+
+    async logout() {
+      if (MOCK) {
+        // ── [MOCK] ───────────────────────────────────────────────────────
+        mockDel(KEYS.session);
+        return { ok: true };
+        // ── [MOCK] ───────────────────────────────────────────────────────
+      }
+
+      // ── [REAL API] ───────────────────────────────────────────────────────
+      // try {
+      //   await fetchJSON('/auth/logout', { method: 'POST' });
+      //   mockDel(KEYS.session);    // borra la caché local de sesión
+      //   return { ok: true };
+      // } catch (e) {
+      //   return { ok: false, message: e.message };
+      // }
+      // ── [REAL API] ───────────────────────────────────────────────────────
+    },
+
+    // Devuelve el usuario en sesión desde la caché local (síncrono).
+    // En modo real la sesión viene del servidor, pero la cacheamos en
+    // localStorage para no hacer un fetch extra en cada carga de página.
+    getSession() {
+      return mockGet(KEYS.session, null);
+    },
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════
+  //  NOTAS
+  //  Rutas esperadas en el servidor:
+  //    GET    /api/notas        → { notas: [...] }
+  //    POST   /api/notas        { asignatura, evaluacion, fecha, nota } → { nota }
+  //    DELETE /api/notas/:id    → { ok }
+  // ═══════════════════════════════════════════════════════════════════════
+  const NOTAS_DEFAULT = [
+    { id: 1, asignatura: 'Matemáticas', evaluacion: 'Examen Álgebra',           fecha: '2026-04-10', nota: 8.5 },
+    { id: 2, asignatura: 'Lengua',      evaluacion: 'Redacción narrativa',       fecha: '2026-04-15', nota: 7.0 },
+    { id: 3, asignatura: 'Historia',    evaluacion: 'Prueba Revolución Francesa',fecha: '2026-04-22', nota: 9.2 },
+    { id: 4, asignatura: 'Inglés',      evaluacion: 'Listening B2',              fecha: '2026-05-02', nota: 6.5 },
+    { id: 5, asignatura: 'Ciencias',    evaluacion: 'Lab: Reacciones Químicas',  fecha: '2026-05-08', nota: 5.0 },
+    { id: 6, asignatura: 'Matemáticas', evaluacion: 'Control Geometría',         fecha: '2026-05-12', nota: 9.8 },
+  ];
+
+  const notas = {
+    async getAll() {
+      if (MOCK) {
+        // ── [MOCK] ───────────────────────────────────────────────────────
+        const stored = mockGet(KEYS.notes, null);
+        if (!stored) { mockSet(KEYS.notes, NOTAS_DEFAULT); return [...NOTAS_DEFAULT]; }
+        return stored;
+        // ── [MOCK] ───────────────────────────────────────────────────────
+      }
+
+      // ── [REAL API] ───────────────────────────────────────────────────────
+      // const data = await fetchJSON('/notas');
+      // return data.notas;
+      // ── [REAL API] ───────────────────────────────────────────────────────
+    },
+
+    async add(asignatura, evaluacion, fecha, nota) {
+      if (MOCK) {
+        // ── [MOCK] ───────────────────────────────────────────────────────
+        const list = mockGet(KEYS.notes, []);
+        const id   = list.length ? Math.max(...list.map(n => n.id)) + 1 : 1;
+        const nueva = { id, asignatura, evaluacion, fecha, nota };
+        list.push(nueva);
+        mockSet(KEYS.notes, list);
+        return { ok: true, nota: nueva };
+        // ── [MOCK] ───────────────────────────────────────────────────────
+      }
+
+      // ── [REAL API] ───────────────────────────────────────────────────────
+      // try {
+      //   const data = await fetchJSON('/notas', {
+      //     method: 'POST',
+      //     body: JSON.stringify({ asignatura, evaluacion, fecha, nota }),
+      //   });
+      //   return { ok: true, nota: data.nota };
+      // } catch (e) {
+      //   return { ok: false, message: e.message };
+      // }
+      // ── [REAL API] ───────────────────────────────────────────────────────
+    },
+
+    async delete(id) {
+      if (MOCK) {
+        // ── [MOCK] ───────────────────────────────────────────────────────
+        const list = mockGet(KEYS.notes, []).filter(n => n.id !== id);
+        mockSet(KEYS.notes, list);
+        return { ok: true };
+        // ── [MOCK] ───────────────────────────────────────────────────────
+      }
+
+      // ── [REAL API] ───────────────────────────────────────────────────────
+      // try {
+      //   await fetchJSON(`/notas/${id}`, { method: 'DELETE' });
+      //   return { ok: true };
+      // } catch (e) {
+      //   return { ok: false, message: e.message };
+      // }
+      // ── [REAL API] ───────────────────────────────────────────────────────
+    },
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════
+  //  CURSOS  (stub — pendiente de implementar)
+  //  Rutas esperadas:
+  //    GET /api/cursos              → { cursos: [...] }
+  //    GET /api/cursos/:id          → { curso }
+  //    POST /api/cursos/:id/matricular → { ok }
+  // ═══════════════════════════════════════════════════════════════════════
+  const cursos = {
+    async getAll() {
+      if (MOCK) return [];   // TODO: rellenar con datos de prueba cuando se diseñe cursos.html
+      // ── [REAL API] ─────────────────────────────────────────────────────
+      // const data = await fetchJSON('/cursos');
+      // return data.cursos;
+      // ── [REAL API] ─────────────────────────────────────────────────────
+    },
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════
+  //  TAREAS  (stub — pendiente de implementar)
+  //  Rutas esperadas:
+  //    GET  /api/tareas              → { tareas: [...] }
+  //    POST /api/tareas/:id/entregar → { ok }
+  // ═══════════════════════════════════════════════════════════════════════
+  const TAREAS_DEFAULT = [
+    { id: 1, nombre: 'Ejercicios de Álgebra', asignatura: 'Matemáticas', fecha: '2026-05-18', estado: 'Pendiente' },
+    { id: 2, nombre: 'Redacción sobre El Quijote', asignatura: 'Lengua', fecha: '2026-05-20', estado: 'Pendiente' },
+    { id: 3, nombre: 'Informe Revolución Industrial', asignatura: 'Historia', fecha: '2026-05-10', estado: 'Vencida' },
+    { id: 4, nombre: 'Listening Unit 8', asignatura: 'Inglés', fecha: '2026-05-15', estado: 'Acabada' },
+  ];
+
+  const tareas = {
+    async getAll() {
+      if (MOCK) {
+        const stored = mockGet('sorohub_tareas', null);
+        if (!stored) { mockSet('sorohub_tareas', TAREAS_DEFAULT); return [...TAREAS_DEFAULT]; }
+        return stored;
+      }
+      // ── [REAL API] ─────────────────────────────────────────────────────
+      // const data = await fetchJSON('/tareas');
+      // return data.tareas;
+    },
+    async saveAll(lista) {
+      if (MOCK) {
+        mockSet('sorohub_tareas', lista);
+        return { ok: true };
+      }
+      // Este método es un helper para el MOCK.
+      // En la API real se usarían endpoints individuales para añadir/editar/eliminar.
+    }
+  };
+
+  // API pública
+  return { auth, notas, cursos, tareas };
+
+})();

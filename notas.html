@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mis Notas - SoroHub</title>
+  <link rel="stylesheet" href="css/estilos.css" />
+  <link rel="icon" type="image/png" href="imagenes/logo_blanco.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/notas.css" />
+</head>
+<body>
+
+<header class="barra-superior">
+  <a href="SoroHub.html" class="contenedor-logo">
+    <img src="imagenes/logo_sorohub_blanco.png" alt="Logo SoroHub" class="logo-img">
+    <span class="soroHub">SoroHub</span>
+  </a>
+  <nav class="navegacion">
+    <a href="SoroHub.html">Inicio</a>
+    <a href="recursos.html">Recursos</a>
+    <a href="tareas.html">Tareas</a>
+    <a href="creadores.html">Creadores</a>
+  </nav>
+  <div class="acciones">
+    <a class="boton boton-secundario" href="login.html?modo=login">Iniciar sesión</a>
+    <a class="boton boton-principal" href="login.html?modo=registro">Registrarse</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero-notas">
+    <div class="hero-notas-texto">
+      <div class="alumno-badge" id="alumno-badge">👤 Alumno: <strong id="nombre-alumno">Invitado</strong></div>
+      <h1>📊 Mis Notas</h1>
+      <p>Consulta y gestiona tu seguimiento académico por asignatura</p>
+    </div>
+    <div class="estadisticas-rapidas">
+      <div class="stat-card">
+        <span class="stat-valor" id="stat-media">—</span>
+        <span class="stat-label">Media general</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-valor" id="stat-total">0</span>
+        <span class="stat-label">Evaluaciones</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-valor" id="stat-mejor">—</span>
+        <span class="stat-label">Mejor nota</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTROLES -->
+  <div class="controles-notas">
+    <div id="filtros" style="display:none;"></div>
+    <div class="acciones-notas">
+      <select class="select-orden" id="selectOrden">
+        <option value="fecha-desc">Más recientes primero</option>
+        <option value="fecha-asc">Más antiguas primero</option>
+        <option value="nota-desc">Mayor nota primero</option>
+        <option value="nota-asc">Menor nota primero</option>
+        <option value="asignatura">Por asignatura</option>
+      </select>
+      <button class="boton-nueva-nota" id="btnNuevaNota">＋ Añadir nota</button>
+    </div>
+  </div>
+
+  <!-- TABLA -->
+  <div class="contenedor-tabla">
+    <table class="tabla-notas">
+      <thead>
+        <tr>
+          <th>Asignatura</th>
+          <th>Evaluación / Examen</th>
+          <th>Fecha</th>
+          <th>Nota</th>
+          <th>Progreso</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="cuerpoTabla">
+        <!-- Filas generadas por JS -->
+      </tbody>
+    </table>
+  </div>
+
+</main>
+
+<!-- MODAL -->
+<div class="overlay-modal" id="overlayModal">
+  <div class="modal">
+    <h2>✏️ Añadir nueva nota</h2>
+    <div class="campo-form">
+      <label for="inputAsignatura">Asignatura</label>
+      <input type="text" id="inputAsignatura" placeholder="Ej: Matemáticas, Ciencias...">
+    </div>
+    <div class="campo-form">
+      <label for="inputEvaluacion">Evaluación / Examen</label>
+      <input type="text" id="inputEvaluacion" placeholder="Ej: Examen Tema 3, Redacción...">
+    </div>
+    <div class="campo-form">
+      <label for="inputFecha">Fecha</label>
+      <input type="date" id="inputFecha">
+    </div>
+    <div class="campo-form">
+      <label for="inputNota">Nota (0 – 10)</label>
+      <input type="number" id="inputNota" min="0" max="10" step="0.1" placeholder="Ej: 8.5">
+    </div>
+    <div class="modal-acciones">
+      <button class="boton-cancelar" id="btnCancelar">Cancelar</button>
+      <button class="boton-guardar" id="btnGuardar">Guardar nota</button>
+    </div>
+  </div>
+</div>
+
+<footer class="pie-pagina">
+  <p>© 2026 Plataforma Educativa - Equipo de desarrollo</p>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/notas.js"></script>
+</body>
+</html>
