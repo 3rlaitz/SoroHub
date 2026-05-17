@@ -7,14 +7,8 @@ let sesionUsuario = SoroAPI.auth.getSession();
 
 // ── INIT ─────────────────────────────────────────────────────────────────
 function init() {
-  if (!sesionUsuario) {
-    document.getElementById('seccionBloqueada').style.display = 'flex';
-    document.getElementById('contenidoPrincipal').style.display = 'none';
-  } else {
-    document.getElementById('seccionBloqueada').style.display = 'none';
-    document.getElementById('contenidoPrincipal').style.display = 'block';
-    renderRecursos();
-  }
+  renderRecursos();
+  SoroAuth.requerirSesion();
 }
 
 // ── RENDER ───────────────────────────────────────────────────────────────

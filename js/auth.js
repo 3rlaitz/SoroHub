@@ -42,6 +42,28 @@
     register  : (nombre, apellidos, email, pass)      => SoroAPI.auth.register(nombre, apellidos, email, pass),
     logout    : ()                                    => SoroAPI.auth.logout(),
     getSession: ()                                    => SoroAPI.auth.getSession(),
+    requerirSesion: () => {
+      if (!SoroAPI.auth.getSession()) {
+        const main = document.querySelector('main');
+        if (main) main.classList.add('contenido-borroso');
+        
+        const div = document.createElement('div');
+        div.className = 'bloqueo-overlay';
+        div.innerHTML = `
+          <div class="bloqueo-contenido">
+            <h1>🔒 Acceso Restringido</h1>
+            <p>Inicia sesión o regístrate para ver y gestionar el contenido de esta sección.</p>
+            <div style="display:flex; gap:10px; justify-content:center;">
+              <a class="boton boton-principal" href="login.html?modo=login">Iniciar sesión</a>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(div);
+        document.body.style.overflow = 'hidden';
+        return false;
+      }
+      return true;
+    }
   };
 
   actualizarHeader();

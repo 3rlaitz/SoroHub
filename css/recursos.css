@@ -1,23 +1,6 @@
 body { font-family: 'Inter', Arial, sans-serif; }
 
-/* ── SECCIÓN BLOQUEADA ── */
-.seccion-bloqueada {
-  height: 70vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-.bloqueo-contenido h1 {
-  font-size: 2.5rem;
-  color: #ef4444;
-  margin-bottom: 15px;
-}
-.bloqueo-contenido p {
-  font-size: 1.1rem;
-  color: #94a3b8;
-  margin-bottom: 25px;
-}
+
 
 /* ── HERO RECURSOS ── */
 .hero-recursos {

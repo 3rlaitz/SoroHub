@@ -118,4 +118,5 @@
   (async function init() {
     notas = await SoroAPI.notas.getAll();
     renderizar();
+    SoroAuth.requerirSesion();
   })();

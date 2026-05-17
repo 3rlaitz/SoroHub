@@ -22,6 +22,7 @@
     renderCalendario();
     renderLista();
     actualizarStats();
+    SoroAuth.requerirSesion();
   }
 
   // ── CALENDARIO ───────────────────────────────────────────────────────────
