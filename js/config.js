@@ -9,12 +9,12 @@ const SoroConfig = {
   // Ejemplos:
   //   Desarrollo local → 'http://localhost:8080/api'
   //   Producción       → 'https://sorohub.com/api'
-  API_BASE_URL: 'http://localhost:8080/api',
+  API_BASE_URL: 'http://localhost:3000/api',
 
   // ── Modo mock ────────────────────────────────────────────────────────────
   // true  → usa localStorage (sin servidor, para desarrollo/pruebas)
   // false → usa fetch() contra API_BASE_URL (requiere servidor + BD activos)
   //
   // TODO: pon USE_MOCK = false cuando la base de datos esté conectada.
-  USE_MOCK: true,
+  USE_MOCK: false,
 };

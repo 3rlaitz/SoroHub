@@ -76,64 +76,64 @@ const SoroAPI = (() => {
       }
 
       // ── [REAL API] ───────────────────────────────────────────────────────
-      // try {
-      //   const data = await fetchJSON('/auth/login', {
-      //     method: 'POST',
-      //     body: JSON.stringify({ email, password }),
-      //   });
-      //   mockSet(KEYS.session, data.user);   // cachea la sesión en localStorage
-      //   return { ok: true, user: data.user };
-      // } catch (e) {
-      //   return { ok: false, message: e.message };
-      // }
+      try {
+        const data = await fetchJSON('/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({ email, password }),
+        });
+        mockSet(KEYS.session, data.user);   // cachea la sesión en localStorage
+        return { ok: true, user: data.user };
+      } catch (e) {
+        return { ok: false, message: e.message };
+      }
       // ── [REAL API] ───────────────────────────────────────────────────────
     },
 
     async register(nombre, apellidos, email, password) {
       if (MOCK) {
         // ── [MOCK] ───────────────────────────────────────────────────────
-        const users = mockGet(KEYS.users, []);
-        if (users.find(u => u.email === email))
-          return { ok: false, message: 'El correo ya está registrado' };
-        const newUser = { nombre, apellidos, email, password };
-        users.push(newUser);
-        mockSet(KEYS.users, users);
-        const { password: _, ...safe } = newUser;
-        mockSet(KEYS.session, safe);
-        return { ok: true, user: safe };
+        // const users = mockGet(KEYS.users, []);
+        // if (users.find(u => u.email === email))
+        //   return { ok: false, message: 'El correo ya está registrado' };
+        // const newUser = { nombre, apellidos, email, password };
+        // users.push(newUser);
+        // mockSet(KEYS.users, users);
+        // const { password: _, ...safe } = newUser;
+        // mockSet(KEYS.session, safe);
+        // return { ok: true, user: safe };
         // ── [MOCK] ───────────────────────────────────────────────────────
       }
 
       // ── [REAL API] ───────────────────────────────────────────────────────
-      // try {
-      //   const data = await fetchJSON('/auth/register', {
-      //     method: 'POST',
-      //     body: JSON.stringify({ nombre, apellidos, email, password }),
-      //   });
-      //   mockSet(KEYS.session, data.user);
-      //   return { ok: true, user: data.user };
-      // } catch (e) {
-      //   return { ok: false, message: e.message };
-      // }
+      try {
+        const data = await fetchJSON('/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({ nombre, apellidos, email, password }),
+        });
+        mockSet(KEYS.session, data.user);
+        return { ok: true, user: data.user };
+      } catch (e) {
+        return { ok: false, message: e.message };
+      }
       // ── [REAL API] ───────────────────────────────────────────────────────
     },
 
     async logout() {
       if (MOCK) {
         // ── [MOCK] ───────────────────────────────────────────────────────
-        mockDel(KEYS.session);
-        return { ok: true };
+        // mockDel(KEYS.session);
+        // return { ok: true };
         // ── [MOCK] ───────────────────────────────────────────────────────
       }
 
       // ── [REAL API] ───────────────────────────────────────────────────────
-      // try {
-      //   await fetchJSON('/auth/logout', { method: 'POST' });
-      //   mockDel(KEYS.session);    // borra la caché local de sesión
-      //   return { ok: true };
-      // } catch (e) {
-      //   return { ok: false, message: e.message };
-      // }
+      try {
+        await fetchJSON('/auth/logout', { method: 'POST' });
+        mockDel(KEYS.session);    // borra la caché local de sesión
+        return { ok: true };
+      } catch (e) {
+        return { ok: false, message: e.message };
+      }
       // ── [REAL API] ───────────────────────────────────────────────────────
     },
 
@@ -165,59 +165,59 @@ const SoroAPI = (() => {
     async getAll() {
       if (MOCK) {
         // ── [MOCK] ───────────────────────────────────────────────────────
-        const stored = mockGet(KEYS.notes, null);
-        if (!stored) { mockSet(KEYS.notes, NOTAS_DEFAULT); return [...NOTAS_DEFAULT]; }
-        return stored;
+        // const stored = mockGet(KEYS.notes, null);
+        // if (!stored) { mockSet(KEYS.notes, NOTAS_DEFAULT); return [...NOTAS_DEFAULT]; }
+        // return stored;
         // ── [MOCK] ───────────────────────────────────────────────────────
       }
 
       // ── [REAL API] ───────────────────────────────────────────────────────
-      // const data = await fetchJSON('/notas');
-      // return data.notas;
+      const data = await fetchJSON('/notas');
+      return data.notas;
       // ── [REAL API] ───────────────────────────────────────────────────────
     },
 
     async add(asignatura, evaluacion, fecha, nota) {
       if (MOCK) {
         // ── [MOCK] ───────────────────────────────────────────────────────
-        const list = mockGet(KEYS.notes, []);
-        const id   = list.length ? Math.max(...list.map(n => n.id)) + 1 : 1;
-        const nueva = { id, asignatura, evaluacion, fecha, nota };
-        list.push(nueva);
-        mockSet(KEYS.notes, list);
-        return { ok: true, nota: nueva };
+        // const list = mockGet(KEYS.notes, []);
+        // const id   = list.length ? Math.max(...list.map(n => n.id)) + 1 : 1;
+        // const nueva = { id, asignatura, evaluacion, fecha, nota };
+        // list.push(nueva);
+        // mockSet(KEYS.notes, list);
+        // return { ok: true, nota: nueva };
         // ── [MOCK] ───────────────────────────────────────────────────────
       }
 
       // ── [REAL API] ───────────────────────────────────────────────────────
-      // try {
-      //   const data = await fetchJSON('/notas', {
-      //     method: 'POST',
-      //     body: JSON.stringify({ asignatura, evaluacion, fecha, nota }),
-      //   });
-      //   return { ok: true, nota: data.nota };
-      // } catch (e) {
-      //   return { ok: false, message: e.message };
-      // }
+      try {
+        const data = await fetchJSON('/notas', {
+          method: 'POST',
+          body: JSON.stringify({ asignatura, evaluacion, fecha, nota }),
+        });
+        return { ok: true, nota: data.nota };
+      } catch (e) {
+        return { ok: false, message: e.message };
+      }
       // ── [REAL API] ───────────────────────────────────────────────────────
     },
 
     async delete(id) {
       if (MOCK) {
         // ── [MOCK] ───────────────────────────────────────────────────────
-        const list = mockGet(KEYS.notes, []).filter(n => n.id !== id);
-        mockSet(KEYS.notes, list);
-        return { ok: true };
+        // const list = mockGet(KEYS.notes, []).filter(n => n.id !== id);
+        // mockSet(KEYS.notes, list);
+        // return { ok: true };
         // ── [MOCK] ───────────────────────────────────────────────────────
       }
 
       // ── [REAL API] ───────────────────────────────────────────────────────
-      // try {
-      //   await fetchJSON(`/notas/${id}`, { method: 'DELETE' });
-      //   return { ok: true };
-      // } catch (e) {
-      //   return { ok: false, message: e.message };
-      // }
+      try {
+        await fetchJSON(`/notas/${id}`, { method: 'DELETE' });
+        return { ok: true };
+      } catch (e) {
+        return { ok: false, message: e.message };
+      }
       // ── [REAL API] ───────────────────────────────────────────────────────
     },
   };
@@ -233,8 +233,8 @@ const SoroAPI = (() => {
     async getAll() {
       if (MOCK) return [];   // TODO: rellenar con datos de prueba cuando se diseñe cursos.html
       // ── [REAL API] ─────────────────────────────────────────────────────
-      // const data = await fetchJSON('/cursos');
-      // return data.cursos;
+      const data = await fetchJSON('/cursos');
+      return data.cursos;
       // ── [REAL API] ─────────────────────────────────────────────────────
     },
   };
@@ -260,8 +260,8 @@ const SoroAPI = (() => {
         return stored;
       }
       // ── [REAL API] ─────────────────────────────────────────────────────
-      // const data = await fetchJSON('/tareas');
-      // return data.tareas;
+      const data = await fetchJSON('/tareas');
+      return data.tareas;
     },
     async saveAll(lista) {
       if (MOCK) {
