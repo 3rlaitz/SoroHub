@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 const db = require('./database');
+const bcrypt = require('bcrypt')
 
 const app = express();
 
@@ -15,24 +16,29 @@ app.use(session({
 
 // ── AUTH ────────────────────────────────────────────────────────────────
 
-app.post('/api/auth/register', (req, res) => {
+app.post('/api/auth/register', async (req, res) => {
   const { nombre, apellidos, email, password } = req.body;
   const existe = db.prepare('SELECT id FROM usuarios WHERE email = ?').get(email);
   if (existe) return res.status(400).json({ message: 'El correo ya está registrado' });
 
+  const hash = await bcrypt.hash(password, 10);
+
   const result = db.prepare(
     'INSERT INTO usuarios (nombre, apellidos, email, password) VALUES (?, ?, ?, ?)'
-  ).run(nombre, apellidos, email, password);
+  ).run(nombre, apellidos, email, hash);
 
   const user = { id: result.lastInsertRowid, nombre, apellidos, email };
   req.session.user = user;
   res.json({ ok: true, user });
 });
 
-app.post('/api/auth/login', (req, res) => {
+app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body;
-  const user = db.prepare('SELECT * FROM usuarios WHERE email = ? AND password = ?').get(email, password);
+  const user = db.prepare('SELECT * FROM usuarios WHERE email = ?').get(email);
   if (!user) return res.status(401).json({ message: 'Credenciales incorrectas' });
+
+  const ok = await bcrypt.compare(password, user.password);
+  if (!ok) return res.status(401).json({ message: 'Credenciales incorrectas' });
 
   const { password: _, ...safe } = user;
   req.session.user = safe;
