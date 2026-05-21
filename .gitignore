@@ -1,6 +1,6 @@
 # Se crea .gitignore para no subir a git carpetas inecesarias del backend o archivos que pueden comprometer la web
 backend/node_modules/
-backend/sorohub.db
+backend/*.db
 backend/.env
 *.log
 .DS_Store

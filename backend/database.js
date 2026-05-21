@@ -22,11 +22,29 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS tareas (
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id    INTEGER,
+    tipo       TEXT DEFAULT 'Tarea',
     nombre     TEXT,
     asignatura TEXT,
     fecha      TEXT,
     estado     TEXT
   );
+
+  CREATE TABLE IF NOT EXISTS recursos (
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id        INTEGER,
+    titulo         TEXT,
+    desc           TEXT,
+    autor          TEXT,
+    fecha          TEXT,
+    nombre_archivo TEXT,
+    archivo_data   TEXT,
+    comentarios    TEXT DEFAULT '[]'
+  );
 `);
+
+const columnasTareas = db.prepare('PRAGMA table_info(tareas)').all().map(col => col.name);
+if (!columnasTareas.includes('tipo')) {
+  db.prepare("ALTER TABLE tareas ADD COLUMN tipo TEXT DEFAULT 'Tarea'").run();
+}
 
 module.exports = db;

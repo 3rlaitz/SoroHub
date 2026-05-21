@@ -268,12 +268,93 @@ const SoroAPI = (() => {
         mockSet('sorohub_tareas', lista);
         return { ok: true };
       }
+      const guardadas = await Promise.all(lista.map(t => this.update(t.id, t)));
+      return { ok: guardadas.every(r => r.ok) };
       // Este método es un helper para el MOCK.
       // En la API real se usarían endpoints individuales para añadir/editar/eliminar.
+    },
+    async add(tarea) {
+      if (MOCK) {
+        const list = mockGet('sorohub_tareas', []);
+        const id = list.length ? Math.max(...list.map(t => t.id)) + 1 : 1;
+        const nueva = { id, ...tarea };
+        list.push(nueva);
+        mockSet('sorohub_tareas', list);
+        return { ok: true, tarea: nueva };
+      }
+      try {
+        const data = await fetchJSON('/tareas', {
+          method: 'POST',
+          body: JSON.stringify(tarea),
+        });
+        return { ok: true, tarea: data.tarea };
+      } catch (e) {
+        return { ok: false, message: e.message };
+      }
+    },
+    async update(id, tarea) {
+      if (MOCK) {
+        const list = mockGet('sorohub_tareas', []);
+        const index = list.findIndex(t => t.id == id);
+        if (index >= 0) list[index] = { ...list[index], ...tarea, id: Number(id) };
+        mockSet('sorohub_tareas', list);
+        return { ok: true, tarea: list[index] };
+      }
+      try {
+        const data = await fetchJSON(`/tareas/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(tarea),
+        });
+        return { ok: true, tarea: data.tarea };
+      } catch (e) {
+        return { ok: false, message: e.message };
+      }
+    },
+    async delete(id) {
+      if (MOCK) {
+        const list = mockGet('sorohub_tareas', []).filter(t => t.id != id);
+        mockSet('sorohub_tareas', list);
+        return { ok: true };
+      }
+      try {
+        await fetchJSON(`/tareas/${id}`, { method: 'DELETE' });
+        return { ok: true };
+      } catch (e) {
+        return { ok: false, message: e.message };
+      }
     }
   };
 
+  const recursos = {
+    async getAll() {
+      const data = await fetchJSON('/recursos');
+      return data.recursos;
+    },
+    async add(titulo, desc, nombreArchivo, archivoData) {
+      try {
+        const data = await fetchJSON('/recursos', {
+          method: 'POST',
+          body: JSON.stringify({ titulo, desc, nombreArchivo, archivoData }),
+        });
+        return { ok: true, recurso: data.recurso };
+      } catch (e) {
+        return { ok: false, message: e.message };
+      }
+    },
+    async addComentario(id, texto) {
+      try {
+        const data = await fetchJSON(`/recursos/${id}/comentarios`, {
+          method: 'POST',
+          body: JSON.stringify({ texto }),
+        });
+        return { ok: true, comentario: data.comentario };
+      } catch (e) {
+        return { ok: false, message: e.message };
+      }
+    },
+  };
+
   // API pública
-  return { auth, notas, cursos, tareas };
+  return { auth, notas, cursos, tareas, recursos };
 
 })();

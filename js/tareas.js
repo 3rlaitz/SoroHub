@@ -3,6 +3,7 @@
   let fechaCalendario = new Date(); // Mes y año actual visualizado
   let filtroActual = 'todas';
   let busqueda = '';
+  const sesion = SoroAPI.auth.getSession();
 
   // ── INIT ─────────────────────────────────────────────────────────────────
   async function init() {
@@ -188,14 +189,17 @@
     if (id) {
       // Editar
       const t = tareas.find(x => x.id == id);
-      t.tipo = tipo; t.nombre = nombre; t.asignatura = asignatura; t.fecha = fecha; t.estado = estado;
+      const actualizada = { ...t, tipo, nombre, asignatura, fecha, estado };
+      const res = await SoroAPI.tareas.update(id, actualizada);
+      if (!res.ok) return alert(res.message || 'No se pudo guardar la tarea');
+      Object.assign(t, res.tarea);
     } else {
       // Nuevo
-      const newId = tareas.length ? Math.max(...tareas.map(x=>x.id)) + 1 : 1;
-      tareas.push({ id: newId, tipo, nombre, asignatura, fecha, estado });
+      const res = await SoroAPI.tareas.add({ tipo, nombre, asignatura, fecha, estado });
+      if (!res.ok) return alert(res.message || 'No se pudo crear la tarea');
+      tareas.push(res.tarea);
     }
 
-    await SoroAPI.tareas.saveAll(tareas);
     cerrarModal();
     actualizarVistas();
   };
@@ -203,8 +207,9 @@
   document.getElementById('btnEliminar').onclick = async () => {
     const id = document.getElementById('inputId').value;
     if (confirm('¿Seguro que quieres eliminar esta tarea?')) {
+      const res = await SoroAPI.tareas.delete(id);
+      if (!res.ok) return alert(res.message || 'No se pudo eliminar la tarea');
       tareas = tareas.filter(x => x.id != id);
-      await SoroAPI.tareas.saveAll(tareas);
       cerrarModal();
       actualizarVistas();
     }
@@ -214,8 +219,9 @@
     const id = document.getElementById('inputId').value;
     const t = tareas.find(x => x.id == id);
     if(t) {
-      t.estado = 'Acabada';
-      await SoroAPI.tareas.saveAll(tareas);
+      const res = await SoroAPI.tareas.update(id, { ...t, estado: 'Acabada' });
+      if (!res.ok) return alert(res.message || 'No se pudo finalizar la tarea');
+      Object.assign(t, res.tarea);
       cerrarModal();
       actualizarVistas();
     }
@@ -250,7 +256,6 @@
   });
 
   // Badge alumno
-  const sesion = SoroAPI.auth.getSession();
   if (sesion) {
     document.getElementById('alumno-badge').innerHTML = `📋 ${sesion.nombre} ${sesion.apellidos}`;
   }
