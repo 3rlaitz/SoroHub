@@ -18,7 +18,7 @@
 
     if (usuario) {
       acciones.innerHTML = `
-        <span class="saludo-usuario">
+        <span class="saludo-usuario" style="padding: 0% 0% 5% 0%;">
           👋 Bienvenid@, <strong>${usuario.nombre} ${usuario.apellidos}</strong>
         </span>
         <button class="boton boton-secundario" id="btnCerrarSesion">Cerrar sesión</button>
