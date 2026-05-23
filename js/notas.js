@@ -116,7 +116,8 @@
 
   // ── Inicializar: carga notas desde SoroAPI ───────────────────────────────
   (async function init() {
+    if (!SoroAuth.requerirSesion()) return;
+
     notas = await SoroAPI.notas.getAll();
     renderizar();
-    SoroAuth.requerirSesion();
   })();

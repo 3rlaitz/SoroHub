@@ -7,6 +7,8 @@
 
   // ── INIT ─────────────────────────────────────────────────────────────────
   async function init() {
+    if (!SoroAuth.requerirSesion()) return;
+
     tareas = await SoroAPI.tareas.getAll();
     
     // Actualizar estados automáticos (Vencidas si la fecha pasó y están Pendientes)
@@ -23,7 +25,6 @@
     renderCalendario();
     renderLista();
     actualizarStats();
-    SoroAuth.requerirSesion();
   }
 
   // ── CALENDARIO ───────────────────────────────────────────────────────────

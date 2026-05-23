@@ -19,6 +19,13 @@ app.use(session({
 
 app.use(express.static(path.join(__dirname, '..')));
 
+function requireAuth(req, res, next) {
+  if (!req.session.user) {
+    return res.status(401).json({ message: 'Debes iniciar sesion' });
+  }
+  next();
+}
+
 // ── AUTH ────────────────────────────────────────────────────────────────
 
 app.post('/api/auth/register', async (req, res) => {
@@ -57,32 +64,32 @@ app.post('/api/auth/logout', (req, res) => {
 
 // ── NOTAS ───────────────────────────────────────────────────────────────
 
-app.get('/api/notas', (req, res) => {
-  const notas = db.prepare('SELECT * FROM notas WHERE user_id = ?').all(req.session.user?.id);
+app.get('/api/notas', requireAuth, (req, res) => {
+  const notas = db.prepare('SELECT * FROM notas WHERE user_id = ?').all(req.session.user.id);
   res.json({ notas });
 });
 
-app.post('/api/notas', (req, res) => {
+app.post('/api/notas', requireAuth, (req, res) => {
   const { asignatura, evaluacion, fecha, nota } = req.body;
   const result = db.prepare(
     'INSERT INTO notas (user_id, asignatura, evaluacion, fecha, nota) VALUES (?, ?, ?, ?, ?)'
-  ).run(req.session.user?.id, asignatura, evaluacion, fecha, nota);
+  ).run(req.session.user.id, asignatura, evaluacion, fecha, nota);
   res.json({ nota: { id: result.lastInsertRowid, asignatura, evaluacion, fecha, nota } });
 });
 
-app.delete('/api/notas/:id', (req, res) => {
-  db.prepare('DELETE FROM notas WHERE id = ? AND user_id = ?').run(req.params.id, req.session.user?.id);
+app.delete('/api/notas/:id', requireAuth, (req, res) => {
+  db.prepare('DELETE FROM notas WHERE id = ? AND user_id = ?').run(req.params.id, req.session.user.id);
   res.json({ ok: true });
 });
 
 // ── TAREAS ──────────────────────────────────────────────────────────────
 
-app.get('/api/tareas', (req, res) => {
-  const tareas = db.prepare('SELECT * FROM tareas WHERE user_id = ?').all(req.session.user?.id);
+app.get('/api/tareas', requireAuth, (req, res) => {
+  const tareas = db.prepare('SELECT * FROM tareas WHERE user_id = ?').all(req.session.user.id);
   res.json({ tareas });
 });
 
-app.post('/api/tareas', (req, res) => {
+app.post('/api/tareas', requireAuth, (req, res) => {
   const user = req.session.user;
   const { tipo, nombre, asignatura, fecha, estado } = req.body;
 
@@ -105,7 +112,7 @@ app.post('/api/tareas', (req, res) => {
   res.json({ tarea: { id: result.lastInsertRowid, ...tarea } });
 });
 
-app.put('/api/tareas/:id', (req, res) => {
+app.put('/api/tareas/:id', requireAuth, (req, res) => {
   const user = req.session.user;
   const { tipo, nombre, asignatura, fecha, estado } = req.body;
 
@@ -122,7 +129,7 @@ app.put('/api/tareas/:id', (req, res) => {
   res.json({ tarea: { id: Number(req.params.id), tipo: tipo || 'Tarea', nombre, asignatura: asignatura || '', fecha, estado: estado || 'Pendiente' } });
 });
 
-app.delete('/api/tareas/:id', (req, res) => {
+app.delete('/api/tareas/:id', requireAuth, (req, res) => {
   const user = req.session.user;
   if (!user) return res.status(401).json({ message: 'Debes iniciar sesión' });
 
