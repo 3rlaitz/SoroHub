@@ -53,7 +53,7 @@
 <!-- MODAL PARA SUBIR RECURSO -->
 <div class="overlay-modal" id="modalSubir">
   <div class="modal">
-    <h2>Subir nuevo recurso</h2>
+    <h2 id="modalTitulo">Subir nuevo recurso</h2>
     <div class="campo-form">
       <label>Título del archivo</label>
       <input type="text" id="inputTitulo" placeholder="Ej: Apuntes Tema 4 - Historia">
@@ -63,8 +63,8 @@
       <input type="text" id="inputDesc" placeholder="¿De qué trata este recurso?">
     </div>
     <div class="campo-form">
-      <label>Archivo .rar</label>
-      <input type="file" id="inputFile" accept=".rar">
+      <label id="labelArchivo">Archivo .rar o PDF</label>
+      <input type="file" id="inputFile" accept=".rar,.pdf">
     </div>
     <div class="modal-acciones">
       <button class="btn-m btn-cancelar" id="btnCancelarSubir">Cancelar</button>

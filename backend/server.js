@@ -132,7 +132,7 @@ app.delete('/api/tareas/:id', (req, res) => {
 
 // ── RECURSOS ─────────────────────────────────────────────────────────────
 
-function normalizarRecurso(r) {
+function normalizarRecurso(r, user) {
   return {
     id: r.id,
     titulo: r.titulo,
@@ -141,12 +141,14 @@ function normalizarRecurso(r) {
     fecha: r.fecha,
     nombreArchivo: r.nombre_archivo,
     archivoData: r.archivo_data,
+    esPropietario: Boolean(user && r.user_id === user.id),
     comentarios: JSON.parse(r.comentarios || '[]'),
   };
 }
 
 app.get('/api/recursos', (req, res) => {
-  const recursos = db.prepare('SELECT * FROM recursos ORDER BY id ASC').all().map(normalizarRecurso);
+  const recursos = db.prepare('SELECT * FROM recursos ORDER BY id ASC').all()
+    .map(r => normalizarRecurso(r, req.session.user));
   res.json({ recursos });
 });
 
@@ -158,8 +160,8 @@ app.post('/api/recursos', (req, res) => {
   if (!titulo || !nombreArchivo || !archivoData) {
     return res.status(400).json({ message: 'Faltan datos del recurso' });
   }
-  if (!nombreArchivo.toLowerCase().endsWith('.rar')) {
-    return res.status(400).json({ message: 'Solo se pueden subir archivos .rar' });
+  if (!nombreArchivo.toLowerCase().endsWith('.rar') && !nombreArchivo.toLowerCase().endsWith('.pdf')) {
+    return res.status(400).json({ message: 'Solo se pueden subir archivos .rar o PDF' });
   }
 
   const fecha = new Date().toISOString().slice(0, 10);
@@ -177,9 +179,52 @@ app.post('/api/recursos', (req, res) => {
       fecha,
       nombreArchivo,
       archivoData,
+      esPropietario: true,
       comentarios: [],
     }
   });
+});
+
+app.put('/api/recursos/:id', (req, res) => {
+  const user = req.session.user;
+  const { titulo, desc, nombreArchivo, archivoData } = req.body;
+
+  if (!user) return res.status(401).json({ message: 'Debes iniciar sesiÃ³n' });
+  if (!titulo?.trim()) return res.status(400).json({ message: 'El tÃ­tulo es obligatorio' });
+
+  const recurso = db.prepare('SELECT * FROM recursos WHERE id = ?').get(req.params.id);
+  if (!recurso) return res.status(404).json({ message: 'Recurso no encontrado' });
+  if (recurso.user_id !== user.id) {
+    return res.status(403).json({ message: 'No puedes modificar un recurso que no es tuyo' });
+  }
+
+  const nuevoNombreArchivo = nombreArchivo || recurso.nombre_archivo;
+  const nuevoArchivoData = archivoData || recurso.archivo_data;
+
+  if (!nuevoNombreArchivo.toLowerCase().endsWith('.rar') && !nuevoNombreArchivo.toLowerCase().endsWith('.pdf')) {
+    return res.status(400).json({ message: 'Solo se pueden subir archivos .rar o PDF' });
+  }
+
+  db.prepare(`
+    UPDATE recursos
+    SET titulo = ?, desc = ?, nombre_archivo = ?, archivo_data = ?
+    WHERE id = ? AND user_id = ?
+  `).run(titulo.trim(), desc || '', nuevoNombreArchivo, nuevoArchivoData, req.params.id, user.id);
+
+  const actualizado = db.prepare('SELECT * FROM recursos WHERE id = ?').get(req.params.id);
+  res.json({ recurso: normalizarRecurso(actualizado, user) });
+});
+
+app.delete('/api/recursos/:id', (req, res) => {
+  const user = req.session.user;
+  if (!user) return res.status(401).json({ message: 'Debes iniciar sesiÃ³n' });
+
+  const result = db.prepare('DELETE FROM recursos WHERE id = ? AND user_id = ?').run(req.params.id, user.id);
+  if (result.changes === 0) {
+    return res.status(403).json({ message: 'No puedes eliminar un recurso que no es tuyo' });
+  }
+
+  res.json({ ok: true });
 });
 
 app.post('/api/recursos/:id/comentarios', (req, res) => {

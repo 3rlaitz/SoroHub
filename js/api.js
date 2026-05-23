@@ -341,6 +341,25 @@ const SoroAPI = (() => {
         return { ok: false, message: e.message };
       }
     },
+    async update(id, titulo, desc, nombreArchivo, archivoData) {
+      try {
+        const data = await fetchJSON(`/recursos/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify({ titulo, desc, nombreArchivo, archivoData }),
+        });
+        return { ok: true, recurso: data.recurso };
+      } catch (e) {
+        return { ok: false, message: e.message };
+      }
+    },
+    async delete(id) {
+      try {
+        await fetchJSON(`/recursos/${id}`, { method: 'DELETE' });
+        return { ok: true };
+      } catch (e) {
+        return { ok: false, message: e.message };
+      }
+    },
     async addComentario(id, texto) {
       try {
         const data = await fetchJSON(`/recursos/${id}/comentarios`, {
