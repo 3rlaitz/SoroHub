@@ -30,11 +30,11 @@ const SoroAPI = (() => {
 
   // ── Helpers de localStorage ─────────────────────────────────────────────
   function mockGet(key, def = null) {
-    try { return JSON.parse(localStorage.getItem(key)) ?? def; }
+    try { return JSON.parse(sessionStorage.getItem(key)) ?? def; }
     catch { return def; }
   }
-  function mockSet(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
-  function mockDel(key)      { localStorage.removeItem(key); }
+  function mockSet(key, val) { sessionStorage.setItem(key, JSON.stringify(val)); }
+  function mockDel(key)      { sessionStorage.removeItem(key); }
 
   // ── Helper de fetch para la API real ───────────────────────────────────
   // Añade cabeceras JSON y gestiona errores HTTP.
