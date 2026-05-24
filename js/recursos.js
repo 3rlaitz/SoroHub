@@ -99,6 +99,13 @@ function descargarRecurso(id) {
   const r = recursos.find(x => x.id === id);
   if (!r) return;
 
+  if (r.archivoUrl) {
+    window.location.href = r.archivoUrl.startsWith('http')
+      ? r.archivoUrl
+      : `${SoroConfig.API_BASE_URL}${r.archivoUrl}`;
+    return;
+  }
+
   const enlace = document.createElement('a');
   enlace.href = r.archivoData;
   enlace.download = r.nombreArchivo || `${r.titulo}.rar`;

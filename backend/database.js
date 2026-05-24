@@ -49,4 +49,15 @@ if (!columnasTareas.includes('tipo')) {
   db.prepare("ALTER TABLE tareas ADD COLUMN tipo TEXT DEFAULT 'Tarea'").run();
 }
 
+const columnasRecursos = db.prepare('PRAGMA table_info(recursos)').all().map(col => col.name);
+if (!columnasRecursos.includes('archivo_path')) {
+  db.prepare('ALTER TABLE recursos ADD COLUMN archivo_path TEXT').run();
+}
+if (!columnasRecursos.includes('archivo_mime')) {
+  db.prepare('ALTER TABLE recursos ADD COLUMN archivo_mime TEXT').run();
+}
+if (!columnasRecursos.includes('archivo_size')) {
+  db.prepare('ALTER TABLE recursos ADD COLUMN archivo_size INTEGER').run();
+}
+
 module.exports = db;
