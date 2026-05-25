@@ -24,7 +24,6 @@ async function init() {
   try {
     recursos = await SoroAPI.recursos.getAll();
   } catch (e) {
-    alert('No se pudieron cargar los recursos del servidor');
     recursos = [];
   }
 

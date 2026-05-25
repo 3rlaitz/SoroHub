@@ -35,7 +35,7 @@
     const res = await SoroAuth.login(email, password);
     if (res.ok) {
       mostrarMensaje('msgLogin', '✅ ¡Sesión iniciada! Redirigiendo…', 'exito');
-      setTimeout(() => window.location.href = 'index.html', 1200);
+      setTimeout(() => window.location.href = '../index.html', 1200);
     } else {
       mostrarMensaje('msgLogin', '❌ ' + (res.message || 'Email o contraseña incorrectos.'), 'error');
     }
@@ -65,7 +65,7 @@
     const res = await SoroAuth.register(nombre, apellidos, email, pass);
     if (res.ok) {
       mostrarMensaje('msgRegistro', '✅ ¡Cuenta creada! Redirigiendo…', 'exito');
-      setTimeout(() => window.location.href = 'index.html', 1200);
+      setTimeout(() => window.location.href = '../index.html', 1200);
     } else {
       mostrarMensaje('msgRegistro', '❌ ' + (res.message || 'Ya existe una cuenta con ese correo.'), 'error');
     }
@@ -83,4 +83,4 @@
   cambiarTab(modoURL === 'registro' ? 'registro' : 'login');
 
   // Redirigir si ya hay sesión activa
-  if (SoroAuth.getSession()) window.location.href = 'index.html';
+  if (SoroAuth.getSession()) window.location.href = '../index.html';
