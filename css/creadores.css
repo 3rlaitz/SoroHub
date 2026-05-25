@@ -1,0 +1,232 @@
+/* ═══════════════════════════════════════════
+   CREADORES.CSS — Estilos de la página de creadores
+   ═══════════════════════════════════════════ */
+
+/* ── SECCIÓN PRINCIPAL ── */
+.seccion-creadores {
+  padding: 60px 30px;
+  text-align: center;
+}
+
+.seccion-creadores h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+  background: linear-gradient(to right, #ffffff, #0ea5e9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.seccion-creadores .subtitulo {
+  color: #94a3b8;
+  font-size: 1.05rem;
+  margin-bottom: 50px;
+}
+
+/* ── GRID DE TARJETAS ── */
+.grid-creadores {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ── FLIP CARD: CONTENEDOR ── */
+.flip-card {
+  perspective: 1200px;
+  height: 460px;
+  cursor: pointer;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.75s cubic-bezier(0.4, 0.2, 0.2, 1), box-shadow 0.3s;
+  transform-style: preserve-3d;
+}
+
+.flip-card.girada .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+/* Hover: eleva la tarjeta igual que antes (solo cuando no está girada) */
+.flip-card:not(.girada):hover .flip-card-inner {
+  transform: translateY(-5px);
+}
+
+.flip-card:not(.girada):hover .flip-card-front {
+  background: #334155;
+}
+
+/* ── CARA DELANTERA Y TRASERA: BASE ── */
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+/* ── CARA DELANTERA ── */
+.flip-card-front {
+  background: var(--color-secundario);
+  border: 1px solid #334155;
+}
+
+.flip-card-front .imagen-creador {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid var(--color-primario);
+  margin-bottom: 15px;
+  box-shadow: 0 0 20px rgba(14, 165, 233, 0.3);
+  transition: box-shadow 0.3s;
+}
+
+.flip-card:not(.girada):hover .flip-card-front .imagen-creador {
+  box-shadow: 0 0 35px rgba(14, 165, 233, 0.55);
+}
+
+.flip-card-front h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-claro);
+  margin-bottom: 8px;
+}
+
+.flip-card-front .rol {
+  font-size: 0.9rem;
+  color: var(--color-primario);
+  margin-bottom: 20px;
+}
+
+.flip-card-front .pista-giro {
+  font-size: 0.78rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: auto;
+  animation: parpadeo 2.5s ease-in-out infinite;
+}
+
+/* ── CARA TRASERA ── */
+.flip-card-back {
+  background: linear-gradient(145deg, #1e293b, #0f172a);
+  border: 1px solid #0ea5e9;
+  transform: rotateY(180deg);
+  justify-content: flex-start;
+  padding-top: 28px;
+}
+
+.flip-card-back .nombre-back {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-claro);
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #334155;
+  width: 100%;
+  text-align: center;
+}
+
+/* ── SECCIONES DE INFO (DESCRIPCIÓN / CONTACTO) ── */
+.seccion-info {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 16px;
+}
+
+.seccion-info .etiqueta {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-primario);
+  margin-bottom: 6px;
+}
+
+.seccion-info .descripcion-texto {
+  font-size: 0.88rem;
+  color: #94a3b8;
+  line-height: 1.55;
+}
+
+/* ── LISTA DE CONTACTO ── */
+.contacto-lista {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.contacto-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #cbd5e1;
+  font-size: 0.88rem;
+  padding: 7px 10px;
+  border-radius: 8px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.contacto-item:hover {
+  background: #334155;
+  color: var(--color-claro);
+}
+
+.contacto-item .icono-contacto {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+/* ── BOTÓN VOLVER ── */
+.btn-volver {
+  margin-top: auto;
+  font-size: 0.78rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  animation: parpadeo 2.5s ease-in-out infinite;
+}
+
+/* ── ANIMACIÓN PARPADEO ── */
+@keyframes parpadeo {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 1;   }
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .grid-creadores {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .grid-creadores {
+    grid-template-columns: 1fr;
+  }
+
+  .seccion-creadores {
+    padding: 40px 15px;
+  }
+}
