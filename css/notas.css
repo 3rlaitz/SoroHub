@@ -307,3 +307,110 @@
       font-family: 'Inter', Arial, sans-serif;
     }
     .boton-cancelar:hover { background: #334155; color: #fff; }
+
+    @media (max-width: 900px) {
+      .hero-notas {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 38px 24px 30px;
+      }
+
+      .estadisticas-rapidas {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .stat-card {
+        min-width: 0;
+        padding: 16px 12px;
+      }
+
+      .controles-notas {
+        padding: 22px 24px;
+      }
+
+      .acciones-notas {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+
+      .contenedor-tabla {
+        padding: 0 24px 36px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .tabla-notas {
+        min-width: 720px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero-notas {
+        padding: 30px 16px 24px;
+        gap: 20px;
+      }
+
+      .hero-notas-texto h1 {
+        font-size: 1.65rem;
+      }
+
+      .hero-notas-texto p {
+        font-size: 0.9rem;
+        line-height: 1.45;
+      }
+
+      .estadisticas-rapidas {
+        grid-template-columns: 1fr;
+      }
+
+      .stat-card .stat-valor {
+        font-size: 1.55rem;
+      }
+
+      .controles-notas {
+        padding: 18px 16px;
+      }
+
+      .acciones-notas,
+      .select-orden,
+      .boton-nueva-nota {
+        width: 100%;
+      }
+
+      .boton-nueva-nota {
+        justify-content: center;
+      }
+
+      .contenedor-tabla {
+        padding: 0 16px 30px;
+      }
+
+      .tabla-notas thead th,
+      .tabla-notas td {
+        padding: 12px 14px;
+        font-size: 0.82rem;
+      }
+
+      .barra-nota {
+        min-width: 120px;
+      }
+
+      .overlay-modal {
+        padding: 16px;
+        align-items: flex-start;
+        overflow-y: auto;
+      }
+
+      .modal {
+        max-width: 100%;
+        padding: 24px 18px;
+        margin: 20px 0;
+      }
+
+      .modal-acciones {
+        flex-direction: column-reverse;
+      }
+    }

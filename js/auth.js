@@ -8,6 +8,8 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 (function () {
+  const enViews = window.location.pathname.includes('/views/');
+  const rutaLogin = enViews ? 'login.html' : 'views/login.html';
 
   // ── Actualiza el header según el estado de sesión ─────────────────────
   function actualizarHeader() {
@@ -29,8 +31,8 @@
       });
     } else {
       acciones.innerHTML = `
-        <a class="boton boton-secundario" href="login.html?modo=login">Iniciar sesión</a>
-        <a class="boton boton-principal"  href="login.html?modo=registro">Registrarse</a>
+        <a class="boton boton-secundario" href="${rutaLogin}?modo=login">Iniciar sesión</a>
+        <a class="boton boton-principal"  href="${rutaLogin}?modo=registro">Registrarse</a>
       `;
     }
   }
@@ -54,7 +56,7 @@
             <h1>🔒 Acceso Restringido</h1>
             <p>Inicia sesión o regístrate para ver y gestionar el contenido de esta sección.</p>
             <div style="display:flex; gap:10px; justify-content:center;">
-              <a class="boton boton-principal" href="login.html?modo=login">Iniciar sesión</a>
+              <a class="boton boton-principal" href="${rutaLogin}?modo=login">Iniciar sesión</a>
             </div>
           </div>
         `;

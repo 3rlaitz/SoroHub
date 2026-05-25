@@ -89,3 +89,112 @@ body { font-family: 'Inter', Arial, sans-serif; }
 .btn-guardar:hover { background: #0284c7; }
 .btn-cancelar { background: transparent; border: 1px solid #334155; color: #94a3b8; }
 .btn-cancelar:hover { background: #334155; color: #fff; }
+
+@media (max-width: 900px) {
+  .hero-recursos {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 38px 24px 30px;
+  }
+
+  .boton-subir {
+    width: 100%;
+  }
+
+  .contenedor-recursos {
+    padding: 30px 24px 44px;
+  }
+
+  .grid-recursos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .recurso-card {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-recursos {
+    padding: 30px 16px 24px;
+  }
+
+  .hero-recursos-texto h1 {
+    font-size: 1.65rem;
+  }
+
+  .hero-recursos-texto p {
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
+  .contenedor-recursos {
+    padding: 24px 12px 34px;
+  }
+
+  .grid-recursos {
+    gap: 12px;
+  }
+
+  .recurso-card {
+    padding: 14px;
+    gap: 12px;
+    border-radius: 12px;
+  }
+
+  .recurso-header h3 {
+    font-size: 1rem;
+    overflow-wrap: anywhere;
+  }
+
+  .recurso-header p,
+  .comentario-item,
+  .form-comentario input {
+    font-size: 0.8rem;
+  }
+
+  .recurso-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .recurso-acciones,
+  .form-comentario {
+    flex-direction: column;
+  }
+
+  .btn-descargar,
+  .btn-editar,
+  .btn-eliminar,
+  .btn-comentar {
+    width: 100%;
+  }
+
+  .btn-comentar {
+    padding: 10px 14px;
+  }
+
+  .overlay-modal {
+    padding: 16px;
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+
+  .modal {
+    max-width: 100%;
+    padding: 24px 18px;
+    margin: 20px 0;
+  }
+
+  .modal-acciones {
+    flex-direction: column-reverse;
+  }
+}
+
+@media (max-width: 360px) {
+  .grid-recursos {
+    grid-template-columns: 1fr;
+  }
+}
