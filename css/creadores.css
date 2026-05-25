@@ -221,12 +221,61 @@
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .grid-creadores {
     grid-template-columns: 1fr;
+    gap: 22px;
+    max-width: 420px;
   }
 
   .seccion-creadores {
-    padding: 40px 15px;
+    padding: 36px 16px;
+  }
+
+  .seccion-creadores h2 {
+    font-size: 1.8rem;
+  }
+
+  .seccion-creadores .subtitulo {
+    margin-bottom: 30px;
+  }
+
+  .flip-card {
+    height: 430px;
+  }
+
+  .flip-card-front,
+  .flip-card-back {
+    padding: 24px 18px;
+  }
+
+  .flip-card-front .imagen-creador {
+    width: clamp(190px, 68vw, 260px);
+    height: clamp(190px, 68vw, 260px);
+  }
+
+  .flip-card-back .nombre-back {
+    font-size: 1.12rem;
+    margin-bottom: 12px;
+  }
+
+  .seccion-info {
+    margin-bottom: 12px;
+  }
+
+  .seccion-info .descripcion-texto,
+  .contacto-item {
+    font-size: 0.82rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .flip-card {
+    height: 400px;
+  }
+
+  .flip-card-front .imagen-creador {
+    width: 180px;
+    height: 180px;
   }
 }

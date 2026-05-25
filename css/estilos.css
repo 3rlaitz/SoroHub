@@ -218,6 +218,45 @@ body {
 }
 
 @media (max-width: 768px) {
+  .barra-superior {
+    position: static;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .contenedor-logo {
+    justify-content: center;
+  }
+
+  .navegacion {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .navegacion a {
+    margin: 0;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.04);
+    font-size: 0.9rem;
+  }
+
+  .acciones {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .boton {
+    padding: 9px 12px;
+    font-size: 0.9rem;
+  }
+
   .contenido-hero-grid {
     grid-template-columns: 1fr;
     text-align: center;
@@ -353,4 +392,26 @@ body {
   filter: blur(5px);
   pointer-events: none;
   user-select: none;
+}
+
+@media (max-width: 768px) {
+  .seccion-tarjetas {
+    grid-template-columns: 1fr;
+    padding: 28px 16px;
+  }
+
+  .pie-pagina {
+    margin-top: 24px;
+    padding: 18px 14px;
+    font-size: 0.88rem;
+  }
+
+  .bloqueo-overlay {
+    top: 0;
+    padding: 16px;
+  }
+
+  .bloqueo-contenido {
+    padding: 28px 20px;
+  }
 }

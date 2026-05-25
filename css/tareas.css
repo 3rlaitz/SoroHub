@@ -191,3 +191,199 @@
     .btn-finalizar:hover { background: #16a34a; }
     .btn-eliminar { background: transparent; border: 1px solid #ef4444; color: #ef4444; }
     .btn-eliminar:hover { background: #ef4444; color: white; }
+
+    @media (max-width: 1000px) {
+      .hero-tareas {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 38px 24px 30px;
+      }
+
+      .stats-tareas {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .stat-card {
+        min-width: 0;
+        padding: 14px 10px;
+      }
+
+      .calendario-container,
+      .lista-tareas-container {
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+
+      .cal-grid {
+        gap: 6px;
+      }
+
+      .cal-dia {
+        min-height: 86px;
+        padding: 6px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .hero-tareas {
+        padding: 30px 16px 24px;
+        gap: 20px;
+      }
+
+      .hero-tareas-texto h1 {
+        font-size: 1.65rem;
+      }
+
+      .hero-tareas-texto p {
+        font-size: 0.9rem;
+        line-height: 1.45;
+      }
+
+      .stats-tareas {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .stat-valor {
+        font-size: 1.55rem;
+      }
+
+      .calendario-container {
+        padding: 24px 8px;
+      }
+
+      .calendario-wrapper {
+        border-radius: 12px;
+        padding: 12px 8px;
+      }
+
+      .calendario-header {
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+
+      .calendario-header h2 {
+        flex: 1;
+        text-align: center;
+        font-size: 1rem;
+        line-height: 1.2;
+      }
+
+      .cal-nav-btn {
+        padding: 8px 9px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+      }
+
+      .cal-grid {
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 3px;
+      }
+
+      .cal-dia-head {
+        font-size: 0.62rem;
+        padding-bottom: 6px;
+      }
+
+      .cal-dia {
+        min-height: 58px;
+        padding: 4px 3px;
+        border-radius: 6px;
+        gap: 2px;
+      }
+
+      .cal-dia:hover {
+        transform: none;
+      }
+
+      .dia-num {
+        font-size: 0.72rem;
+        margin-bottom: 1px;
+      }
+
+      .dia-hoy {
+        padding: 1px 4px;
+      }
+
+      .cal-tarea {
+        font-size: 0;
+        width: 7px;
+        height: 7px;
+        padding: 0;
+        border-radius: 50%;
+        align-self: flex-start;
+      }
+
+      .lista-tareas-container {
+        padding: 0 16px 34px;
+      }
+
+      .controles-lista,
+      .filtros-tab,
+      .buscador {
+        width: 100%;
+      }
+
+      .filtros-tab {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .tab-btn {
+        padding: 9px 10px;
+      }
+
+      .buscador {
+        min-width: 0;
+      }
+
+      .tarea-item {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+        padding: 14px 16px;
+      }
+
+      .tarea-meta {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .tarea-derecha {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+
+      .overlay-modal {
+        padding: 16px;
+        align-items: flex-start;
+        overflow-y: auto;
+      }
+
+      .modal {
+        max-width: 100%;
+        padding: 24px 18px;
+        margin: 20px 0;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .calendario-wrapper {
+        padding: 10px 6px;
+      }
+
+      .cal-dia {
+        min-height: 50px;
+      }
+
+      .cal-nav-btn {
+        padding: 7px 6px;
+        font-size: 0.68rem;
+      }
+
+      .filtros-tab {
+        grid-template-columns: 1fr;
+      }
+    }
