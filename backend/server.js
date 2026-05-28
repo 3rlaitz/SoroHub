@@ -15,6 +15,7 @@ const uploadsDir = path.join(__dirname, 'uploads');
 fs.mkdirSync(uploadsDir, { recursive: true });
 const MAX_RECURSO_FILE_SIZE_MB = 50;
 const MAX_RECURSO_FILE_SIZE = MAX_RECURSO_FILE_SIZE_MB * 1024 * 1024;
+const MAX_RECURSO_REQUEST_SIZE = MAX_RECURSO_FILE_SIZE + 1024 * 1024;
 
 // Middlewares básicos
 app.use(cors({ origin: true, credentials: true }));
@@ -94,49 +95,146 @@ function eliminarArchivoRecurso(archivoPath) {
   }
 }
 
+function extraerBoundary(contentType) {
+  const match = String(contentType || '').match(/boundary=(?:"([^"]+)"|([^;]+))/i);
+  return match ? (match[1] || match[2]).trim() : '';
+}
+
+function dividirBuffer(buffer, separador) {
+  const partes = [];
+  let inicio = 0;
+  let indice = buffer.indexOf(separador, inicio);
+
+  while (indice !== -1) {
+    partes.push(buffer.subarray(inicio, indice));
+    inicio = indice + separador.length;
+    indice = buffer.indexOf(separador, inicio);
+  }
+
+  partes.push(buffer.subarray(inicio));
+  return partes;
+}
+
+function leerBodyLimitado(req, maxBytes) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    let total = 0;
+    let demasiadoGrande = false;
+
+    req.on('data', chunk => {
+      total += chunk.length;
+      if (total > maxBytes) {
+        demasiadoGrande = true;
+        return;
+      }
+      chunks.push(chunk);
+    });
+
+    req.on('end', () => {
+      if (demasiadoGrande) {
+        const err = new Error('REQUEST_TOO_LARGE');
+        err.statusCode = 413;
+        reject(err);
+        return;
+      }
+      resolve(Buffer.concat(chunks));
+    });
+
+    req.on('error', reject);
+  });
+}
+
+function parsearContentDisposition(header) {
+  const datos = {};
+  const partes = String(header || '').split(';').map(parte => parte.trim());
+
+  for (const parte of partes) {
+    const match = parte.match(/^([^=]+)="?([^"]*)"?$/);
+    if (match) datos[match[1].toLowerCase()] = match[2];
+  }
+
+  return datos;
+}
+
+function parsearMultipart(buffer, boundary) {
+  const separador = Buffer.from(`--${boundary}`);
+  const finCabeceras = Buffer.from('\r\n\r\n');
+  const body = {};
+  let file = null;
+
+  for (let parte of dividirBuffer(buffer, separador)) {
+    if (parte.length === 0) continue;
+    if (parte.subarray(0, 2).toString() === '\r\n') parte = parte.subarray(2);
+    if (parte.subarray(0, 2).toString() === '--') continue;
+    if (parte.subarray(-2).toString() === '\r\n') parte = parte.subarray(0, -2);
+
+    const indiceCabeceras = parte.indexOf(finCabeceras);
+    if (indiceCabeceras === -1) continue;
+
+    const cabecerasTexto = parte.subarray(0, indiceCabeceras).toString('latin1');
+    const contenido = parte.subarray(indiceCabeceras + finCabeceras.length);
+    const cabeceras = {};
+
+    for (const linea of cabecerasTexto.split('\r\n')) {
+      const separadorHeader = linea.indexOf(':');
+      if (separadorHeader === -1) continue;
+      const clave = linea.slice(0, separadorHeader).trim().toLowerCase();
+      cabeceras[clave] = linea.slice(separadorHeader + 1).trim();
+    }
+
+    const disposicion = parsearContentDisposition(cabeceras['content-disposition']);
+    if (!disposicion.name) continue;
+
+    if (disposicion.filename) {
+      file = {
+        fieldname: disposicion.name,
+        originalname: path.basename(disposicion.filename),
+        mimetype: cabeceras['content-type'] || 'application/octet-stream',
+        buffer: contenido,
+        size: contenido.length,
+      };
+    } else {
+      body[disposicion.name] = contenido.toString('utf8');
+    }
+  }
+
+  return { body, file };
+}
+
 async function multipartRecurso(req, res, next) {
-  if (!String(req.headers['content-type'] || '').includes('multipart/form-data')) {
+  const contentType = String(req.headers['content-type'] || '');
+  if (!contentType.includes('multipart/form-data')) {
     return next();
   }
 
   const contentLength = Number(req.headers['content-length'] || 0);
-  if (contentLength > MAX_RECURSO_FILE_SIZE) {
+  if (contentLength > MAX_RECURSO_REQUEST_SIZE) {
     return res.status(413).json({ message: `El archivo supera el limite de ${MAX_RECURSO_FILE_SIZE_MB} MB` });
   }
 
   try {
-    const request = new Request('http://localhost/api/recursos', {
-      method: req.method,
-      headers: req.headers,
-      body: req,
-      duplex: 'half',
-    });
-    const formData = await request.formData();
-    const archivo = formData.get('archivo') || formData.get('file');
-
-    req.body = {};
-    for (const [key, value] of formData.entries()) {
-      if (key !== 'archivo' && typeof value === 'string') {
-        req.body[key] = value;
-      }
+    const boundary = extraerBoundary(contentType);
+    if (!boundary) {
+      return res.status(400).json({ message: 'No se pudo recibir el archivo' });
     }
 
-    if (archivo && typeof archivo.arrayBuffer === 'function') {
-      if (archivo.size > MAX_RECURSO_FILE_SIZE) {
+    const buffer = await leerBodyLimitado(req, MAX_RECURSO_REQUEST_SIZE);
+    const { body, file } = parsearMultipart(buffer, boundary);
+
+    req.body = body;
+    req.file = file && (file.fieldname === 'archivo' || file.fieldname === 'file') ? file : undefined;
+
+    if (req.file) {
+      if (req.file.size > MAX_RECURSO_FILE_SIZE) {
         return res.status(413).json({ message: `El archivo supera el limite de ${MAX_RECURSO_FILE_SIZE_MB} MB` });
       }
-
-      req.file = {
-        fieldname: 'archivo',
-        originalname: path.basename(archivo.name || ''),
-        mimetype: archivo.type || 'application/octet-stream',
-        buffer: Buffer.from(await archivo.arrayBuffer()),
-        size: archivo.size,
-      };
     }
 
     next();
   } catch (err) {
+    if (err.statusCode === 413) {
+      return res.status(413).json({ message: `El archivo supera el limite de ${MAX_RECURSO_FILE_SIZE_MB} MB` });
+    }
     console.warn(`No se pudo leer el formulario de subida: ${err.message}`);
     res.status(400).json({ message: 'No se pudo recibir el archivo' });
   }
