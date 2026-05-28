@@ -13,6 +13,7 @@ const app = express();
 // Crea la carpeta de subidas si no existe
 const uploadsDir = path.join(__dirname, 'uploads');
 fs.mkdirSync(uploadsDir, { recursive: true });
+const MAX_RECURSO_FILE_SIZE = 50 * 1024 * 1024;
 
 // Middlewares básicos
 app.use(cors({ origin: true, credentials: true }));
@@ -55,8 +56,7 @@ function nombreArchivoSeguro(id, nombreArchivo) {
 }
 
 // Guarda un archivo en disco y devuelve sus datos
-function guardarArchivoRecurso(id, nombreArchivo, archivoData) {
-  const { mime, buffer } = extraerArchivoData(archivoData);
+function guardarArchivoBuffer(id, nombreArchivo, mime, buffer) {
   const filename = nombreArchivoSeguro(id, nombreArchivo);
   const absolutePath = path.join(uploadsDir, filename);
   fs.writeFileSync(absolutePath, buffer);
@@ -66,6 +66,11 @@ function guardarArchivoRecurso(id, nombreArchivo, archivoData) {
     archivoMime: mime,
     archivoSize: buffer.length,
   };
+}
+
+function guardarArchivoRecurso(id, nombreArchivo, archivoData) {
+  const { mime, buffer } = extraerArchivoData(archivoData);
+  return guardarArchivoBuffer(id, nombreArchivo, mime, buffer);
 }
 
 // Valida que no intenten acceder a rutas peligrosas
@@ -79,7 +84,133 @@ function rutaArchivoAbsoluta(archivoPath) {
 
 // ── MIGRACIONES ──
 // Mueve los archivos viejos (guardados en Base64) al disco duro
+function eliminarArchivoRecurso(archivoPath) {
+  if (!archivoPath) return;
+  try {
+    fs.unlinkSync(rutaArchivoAbsoluta(archivoPath));
+  } catch (err) {
+    if (err.code !== 'ENOENT') {
+      console.warn(`No se pudo eliminar el archivo ${archivoPath}: ${err.message}`);
+    }
+  }
+}
+
+function obtenerBoundary(contentType) {
+  const match = String(contentType || '').match(/boundary=(?:"([^"]+)"|([^;]+))/);
+  return match?.[1] || match?.[2];
+}
+
+function dividirBuffer(buffer, separador) {
+  const partes = [];
+  let inicio = 0;
+  let indice = buffer.indexOf(separador, inicio);
+
+  while (indice !== -1) {
+    partes.push(buffer.subarray(inicio, indice));
+    inicio = indice + separador.length;
+    indice = buffer.indexOf(separador, inicio);
+  }
+
+  partes.push(buffer.subarray(inicio));
+  return partes;
+}
+
+function recortarSaltoLinea(buffer) {
+  let inicio = 0;
+  let fin = buffer.length;
+
+  if (buffer[inicio] === 13 && buffer[inicio + 1] === 10) inicio += 2;
+  if (buffer[fin - 2] === 13 && buffer[fin - 1] === 10) fin -= 2;
+
+  return buffer.subarray(inicio, fin);
+}
+
+function parsearMultipartBuffer(buffer, boundary) {
+  const resultado = { body: {}, file: null };
+  const separador = Buffer.from(`--${boundary}`);
+  const partes = dividirBuffer(buffer, separador);
+
+  for (const parteOriginal of partes) {
+    const parte = recortarSaltoLinea(parteOriginal);
+    if (!parte.length || parte.subarray(0, 2).toString() === '--') continue;
+
+    const headerEnd = parte.indexOf(Buffer.from('\r\n\r\n'));
+    if (headerEnd === -1) continue;
+
+    const headers = parte.subarray(0, headerEnd).toString('latin1');
+    const contenido = recortarSaltoLinea(parte.subarray(headerEnd + 4));
+    const disposition = headers.match(/content-disposition:\s*([^\r\n]+)/i)?.[1] || '';
+    const name = disposition.match(/name="([^"]+)"/i)?.[1];
+    const filename = disposition.match(/filename="([^"]*)"/i)?.[1];
+    const mimetype = headers.match(/content-type:\s*([^\r\n]+)/i)?.[1]?.trim() || 'application/octet-stream';
+
+    if (!name) continue;
+
+    if (filename) {
+      resultado.file = {
+        fieldname: name,
+        originalname: path.basename(filename),
+        mimetype,
+        buffer: contenido,
+        size: contenido.length,
+      };
+    } else {
+      resultado.body[name] = contenido.toString('utf8');
+    }
+  }
+
+  return resultado;
+}
+
+function multipartRecurso(req, res, next) {
+  if (!String(req.headers['content-type'] || '').includes('multipart/form-data')) {
+    return next();
+  }
+
+  const boundary = obtenerBoundary(req.headers['content-type']);
+  if (!boundary) return res.status(400).json({ message: 'Formulario de subida no valido' });
+
+  const chunks = [];
+  let total = 0;
+  let demasiadoGrande = false;
+
+  req.on('data', chunk => {
+    total += chunk.length;
+    if (total > MAX_RECURSO_FILE_SIZE) {
+      demasiadoGrande = true;
+      req.destroy();
+      return;
+    }
+    chunks.push(chunk);
+  });
+
+  req.on('end', () => {
+    if (demasiadoGrande) {
+      return res.status(413).json({ message: 'El archivo supera el limite de 50 MB' });
+    }
+
+    try {
+      const multipart = parsearMultipartBuffer(Buffer.concat(chunks), boundary);
+      req.body = multipart.body;
+      req.file = multipart.file;
+      next();
+    } catch {
+      res.status(400).json({ message: 'No se pudo leer el formulario de subida' });
+    }
+  });
+
+  req.on('error', () => {
+    if (demasiadoGrande) {
+      return res.status(413).json({ message: 'El archivo supera el limite de 50 MB' });
+    }
+    res.status(400).json({ message: 'No se pudo recibir el archivo' });
+  });
+}
+
 function migrarRecursosBase64() {
+  const columnas = db.prepare('PRAGMA table_info(recursos)').all().map(col => col.name);
+  if (!columnas.includes('archivo_data')) return;
+
   const pendientes = db.prepare(`
     SELECT id, nombre_archivo, archivo_data
     FROM recursos
@@ -262,12 +393,14 @@ app.get('/api/recursos', (req, res) => {
 });
 
 // Subir un nuevo recurso
-app.post('/api/recursos', (req, res) => {
-  const { titulo, desc, nombreArchivo, archivoData } = req.body;
+app.post('/api/recursos', multipartRecurso, (req, res) => {
+  const { titulo, desc } = req.body;
+  const archivoSubido = req.file;
+  const nombreArchivo = req.body.nombreArchivo || archivoSubido?.originalname;
   const user = req.session.user;
 
   if (!user) return res.status(401).json({ message: 'Debes iniciar sesión' });
-  if (!titulo || !nombreArchivo || !archivoData) {
+  if (!titulo || !nombreArchivo || !archivoSubido) {
     return res.status(400).json({ message: 'Faltan datos del recurso' });
   }
   if (!extensionPermitida(nombreArchivo)) {
@@ -282,7 +415,12 @@ app.post('/api/recursos', (req, res) => {
 
   let archivo;
   try {
-    archivo = guardarArchivoRecurso(result.lastInsertRowid, nombreArchivo, archivoData);
+    archivo = guardarArchivoBuffer(
+      result.lastInsertRowid,
+      nombreArchivo,
+      archivoSubido.mimetype,
+      archivoSubido.buffer
+    );
   } catch {
     db.prepare('DELETE FROM recursos WHERE id = ? AND user_id = ?').run(result.lastInsertRowid, user.id);
     return res.status(400).json({ message: 'No se pudo procesar el archivo' });
@@ -310,9 +448,10 @@ app.post('/api/recursos', (req, res) => {
 });
 
 // Actualizar un recurso
-app.put('/api/recursos/:id', (req, res) => {
+app.put('/api/recursos/:id', multipartRecurso, (req, res) => {
   const user = req.session.user;
-  const { titulo, desc, nombreArchivo, archivoData } = req.body;
+  const { titulo, desc } = req.body;
+  const archivoSubido = req.file;
 
   if (!user) return res.status(401).json({ message: 'Debes iniciar sesión' });
   if (!titulo?.trim()) return res.status(400).json({ message: 'El título es obligatorio' });
@@ -323,7 +462,7 @@ app.put('/api/recursos/:id', (req, res) => {
     return res.status(403).json({ message: 'No puedes modificar un recurso que no es tuyo' });
   }
 
-  let nuevoNombreArchivo = nombreArchivo || recurso.nombre_archivo;
+  let nuevoNombreArchivo = req.body.nombreArchivo || archivoSubido?.originalname || recurso.nombre_archivo;
   let nuevoArchivoPath = recurso.archivo_path;
   let nuevoArchivoMime = recurso.archivo_mime;
   let nuevoArchivoSize = recurso.archivo_size;
@@ -332,9 +471,17 @@ app.put('/api/recursos/:id', (req, res) => {
     return res.status(400).json({ message: 'Solo se pueden subir archivos .rar o PDF' });
   }
 
-  if (archivoData) {
+  if (archivoSubido) {
     try {
-      const archivo = guardarArchivoRecurso(req.params.id, nuevoNombreArchivo, archivoData);
+      const archivo = guardarArchivoBuffer(
+        req.params.id,
+        nuevoNombreArchivo,
+        archivoSubido.mimetype,
+        archivoSubido.buffer
+      );
+      if (recurso.archivo_path && recurso.archivo_path !== archivo.archivoPath) {
+        eliminarArchivoRecurso(recurso.archivo_path);
+      }
       nuevoArchivoPath = archivo.archivoPath;
       nuevoArchivoMime = archivo.archivoMime;
       nuevoArchivoSize = archivo.archivoSize;
@@ -390,11 +537,13 @@ app.delete('/api/recursos/:id', (req, res) => {
   const user = req.session.user;
   if (!user) return res.status(401).json({ message: 'Debes iniciar sesión' });
 
+  const recurso = db.prepare('SELECT archivo_path FROM recursos WHERE id = ? AND user_id = ?').get(req.params.id, user.id);
   const result = db.prepare('DELETE FROM recursos WHERE id = ? AND user_id = ?').run(req.params.id, user.id);
   if (result.changes === 0) {
     return res.status(403).json({ message: 'No puedes eliminar un recurso que no es tuyo' });
   }
 
+  eliminarArchivoRecurso(recurso?.archivo_path);
   res.json({ ok: true });
 });
 

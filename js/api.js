@@ -42,6 +42,19 @@ const SoroAPI = (() => {
     return res.json();
   }
 
+  async function fetchForm(endpoint, method, formData) {
+    const res = await fetch(BASE + endpoint, {
+      method,
+      body: formData,
+      credentials: 'include',
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.message || `Error ${res.status}: ${res.statusText}`);
+    }
+    return res.json();
+  }
+
   // ═══════════════════════════════════════════════════════════════════════
   //  AUTH
   // ═══════════════════════════════════════════════════════════════════════
@@ -302,23 +315,31 @@ const SoroAPI = (() => {
       const data = await fetchJSON('/recursos');
       return data.recursos;
     },
-    async add(titulo, desc, nombreArchivo, archivoData) {
+    async add(titulo, desc, archivo) {
       try {
-        const data = await fetchJSON('/recursos', {
-          method: 'POST',
-          body: JSON.stringify({ titulo, desc, nombreArchivo, archivoData }),
-        });
+        const formData = new FormData();
+        formData.append('titulo', titulo);
+        formData.append('desc', desc || '');
+        formData.append('nombreArchivo', archivo.name);
+        formData.append('archivo', archivo);
+
+        const data = await fetchForm('/recursos', 'POST', formData);
         return { ok: true, recurso: data.recurso };
       } catch (e) {
         return { ok: false, message: e.message };
       }
     },
-    async update(id, titulo, desc, nombreArchivo, archivoData) {
+    async update(id, titulo, desc, archivo) {
       try {
-        const data = await fetchJSON(`/recursos/${id}`, {
-          method: 'PUT',
-          body: JSON.stringify({ titulo, desc, nombreArchivo, archivoData }),
-        });
+        const formData = new FormData();
+        formData.append('titulo', titulo);
+        formData.append('desc', desc || '');
+        if (archivo) {
+          formData.append('nombreArchivo', archivo.name);
+          formData.append('archivo', archivo);
+        }
+
+        const data = await fetchForm(`/recursos/${id}`, 'PUT', formData);
         return { ok: true, recurso: data.recurso };
       } catch (e) {
         return { ok: false, message: e.message };
