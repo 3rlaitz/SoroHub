@@ -38,17 +38,6 @@ function extensionPermitida(nombreArchivo) {
   return nombre.endsWith('.rar') || nombre.endsWith('.pdf');
 }
 
-// Extrae los bytes de un archivo en Base64
-function extraerArchivoData(archivoData) {
-  const match = String(archivoData || '').match(/^data:([^;]+);base64,(.+)$/);
-  if (!match) {
-    throw new Error('Formato de archivo no valido');
-  }
-
-  const buffer = Buffer.from(match[2], 'base64');
-  return { mime: match[1], buffer };
-}
-
 // Genera un nombre único para evitar colisiones
 function nombreArchivoSeguro(id, nombreArchivo) {
   const extension = path.extname(nombreArchivo || '').toLowerCase();
@@ -68,11 +57,6 @@ function guardarArchivoBuffer(id, nombreArchivo, mime, buffer) {
   };
 }
 
-function guardarArchivoRecurso(id, nombreArchivo, archivoData) {
-  const { mime, buffer } = extraerArchivoData(archivoData);
-  return guardarArchivoBuffer(id, nombreArchivo, mime, buffer);
-}
-
 // Valida que no intenten acceder a rutas peligrosas
 function rutaArchivoAbsoluta(archivoPath) {
   const absolutePath = path.resolve(__dirname, archivoPath || '');
@@ -83,7 +67,21 @@ function rutaArchivoAbsoluta(archivoPath) {
 }
 
 // ── MIGRACIONES ──
-// Mueve los archivos viejos (guardados en Base64) al disco duro
+function asegurarColumnasRecursos() {
+  const columnas = db.prepare('PRAGMA table_info(recursos)').all().map(col => col.name);
+  const columnasNecesarias = [
+    ['archivo_path', 'TEXT'],
+    ['archivo_mime', 'TEXT'],
+    ['archivo_size', 'INTEGER'],
+  ];
+
+  for (const [nombre, tipo] of columnasNecesarias) {
+    if (!columnas.includes(nombre)) {
+      db.prepare(`ALTER TABLE recursos ADD COLUMN ${nombre} ${tipo}`).run();
+    }
+  }
+}
+
 function eliminarArchivoRecurso(archivoPath) {
   if (!archivoPath) return;
   try {
@@ -207,36 +205,7 @@ function multipartRecurso(req, res, next) {
   });
 }
 
-function migrarRecursosBase64() {
-  const columnas = db.prepare('PRAGMA table_info(recursos)').all().map(col => col.name);
-  if (!columnas.includes('archivo_data')) return;
-
-  const pendientes = db.prepare(`
-    SELECT id, nombre_archivo, archivo_data
-    FROM recursos
-    WHERE archivo_data IS NOT NULL
-      AND archivo_data != ''
-      AND (archivo_path IS NULL OR archivo_path = '')
-  `).all();
-
-  const update = db.prepare(`
-    UPDATE recursos
-    SET archivo_path = ?, archivo_mime = ?, archivo_size = ?
-    WHERE id = ?
-  `);
-
-  for (const recurso of pendientes) {
-    try {
-      if (!extensionPermitida(recurso.nombre_archivo)) continue;
-      const archivo = guardarArchivoRecurso(recurso.id, recurso.nombre_archivo, recurso.archivo_data);
-      update.run(archivo.archivoPath, archivo.archivoMime, archivo.archivoSize, recurso.id);
-    } catch (err) {
-      console.warn(`No se pudo migrar el recurso ${recurso.id}: ${err.message}`);
-    }
-  }
-}
-
-migrarRecursosBase64();
+asegurarColumnasRecursos();
 
 // ── MIDDLEWARE AUTENTICACIÓN ──
 // Protege las rutas que requieren inicio de sesión
@@ -371,6 +340,15 @@ app.delete('/api/tareas/:id', requireAuth, (req, res) => {
 // ── RECURSOS ─────────────────────────────────────────────────────────────
 
 // Normaliza los datos de un recurso para enviarlo al cliente
+function parsearComentarios(comentarios) {
+  try {
+    const parsed = JSON.parse(comentarios || '[]');
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
 function normalizarRecurso(r, user) {
   return {
     id: r.id,
@@ -380,8 +358,11 @@ function normalizarRecurso(r, user) {
     fecha: r.fecha,
     nombreArchivo: r.nombre_archivo,
     archivoUrl: `/recursos/${r.id}/descargar`,
+    archivoPath: r.archivo_path,
+    archivoMime: r.archivo_mime,
+    archivoSize: r.archivo_size,
     esPropietario: Boolean(user && r.user_id === user.id),
-    comentarios: JSON.parse(r.comentarios || '[]'),
+    comentarios: parsearComentarios(r.comentarios),
   };
 }
 
@@ -522,13 +503,6 @@ app.get('/api/recursos/:id/descargar', (req, res) => {
     }
   }
 
-  if (recurso.archivo_data) {
-    const { mime, buffer } = extraerArchivoData(recurso.archivo_data);
-    res.setHeader('Content-Type', mime);
-    res.setHeader('Content-Disposition', `attachment; filename="${recurso.nombre_archivo}"`);
-    return res.send(buffer);
-  }
-
   res.status(404).json({ message: 'Archivo no encontrado' });
 });
 
@@ -559,7 +533,7 @@ app.post('/api/recursos/:id/comentarios', (req, res) => {
   if (!recurso) return res.status(404).json({ message: 'Recurso no encontrado' });
 
   const comentario = { autor: user.nombre, texto: texto.trim() };
-  const comentarios = JSON.parse(recurso.comentarios || '[]');
+  const comentarios = parsearComentarios(recurso.comentarios);
   comentarios.push(comentario);
 
   db.prepare('UPDATE recursos SET comentarios = ? WHERE id = ?').run(JSON.stringify(comentarios), req.params.id);

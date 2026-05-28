@@ -7,13 +7,42 @@ function archivoValido(file) {
   return nombre.endsWith('.rar') || nombre.endsWith('.pdf');
 }
 
+function normalizarRecursoCliente(recurso) {
+  let comentarios = recurso.comentarios || [];
+
+  if (typeof comentarios === 'string') {
+    try {
+      comentarios = JSON.parse(comentarios);
+    } catch {
+      comentarios = [];
+    }
+  }
+
+  if (!Array.isArray(comentarios)) comentarios = [];
+
+  return {
+    id: recurso.id,
+    titulo: recurso.titulo || '',
+    desc: recurso.desc || '',
+    autor: recurso.autor || '',
+    fecha: recurso.fecha || '',
+    nombreArchivo: recurso.nombreArchivo || recurso.nombre_archivo || '',
+    archivoPath: recurso.archivoPath || recurso.archivo_path || '',
+    archivoMime: recurso.archivoMime || recurso.archivo_mime || '',
+    archivoSize: recurso.archivoSize ?? recurso.archivo_size ?? 0,
+    archivoUrl: recurso.archivoUrl || `/recursos/${recurso.id}/descargar`,
+    esPropietario: Boolean(recurso.esPropietario),
+    comentarios,
+  };
+}
+
 // ── INICIALIZACIÓN ───────────────────────────────────────────────────────
 async function init() {
   const inputFile = document.getElementById('inputFile');
   if (inputFile) inputFile.accept = '.rar,.pdf';
 
   try {
-    recursos = await SoroAPI.recursos.getAll();
+    recursos = (await SoroAPI.recursos.getAll()).map(normalizarRecursoCliente);
   } catch (e) {
     recursos = [];
   }
@@ -41,6 +70,10 @@ function renderRecursos() {
       <div class="recurso-meta">
         <span class="recurso-autor">Autor: ${r.autor}</span>
         <span>${r.fecha}</span>
+      </div>
+      <div class="recurso-meta">
+        <span>${r.nombreArchivo || 'Archivo sin nombre'}</span>
+        <span>${r.archivoSize ? `${Math.round(r.archivoSize / 1024)} KB` : ''}</span>
       </div>
       <div class="recurso-acciones">
         <a href="#" class="btn-descargar" onclick="descargarRecurso(${r.id}); event.preventDefault();">Descargar archivo</a>
@@ -152,10 +185,12 @@ document.getElementById('btnGuardarRecurso')?.addEventListener('click', async ()
 
   if (!res.ok) return alert(res.message || 'No se pudo publicar el recurso');
 
+  const recursoGuardado = normalizarRecursoCliente(res.recurso);
+
   if (esEdicion) {
-    recursos = recursos.map(r => r.id === recursoEditandoId ? res.recurso : r);
+    recursos = recursos.map(r => r.id === recursoEditandoId ? recursoGuardado : r);
   } else {
-    recursos.push(res.recurso);
+    recursos.push(recursoGuardado);
   }
 
   recursoEditandoId = null;
