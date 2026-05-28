@@ -13,7 +13,8 @@ const app = express();
 // Crea la carpeta de subidas si no existe
 const uploadsDir = path.join(__dirname, 'uploads');
 fs.mkdirSync(uploadsDir, { recursive: true });
-const MAX_RECURSO_FILE_SIZE = 50 * 1024 * 1024;
+const MAX_RECURSO_FILE_SIZE_MB = 500;
+const MAX_RECURSO_FILE_SIZE = MAX_RECURSO_FILE_SIZE_MB * 1024 * 1024;
 
 // Middlewares básicos
 app.use(cors({ origin: true, credentials: true }));
@@ -176,7 +177,6 @@ function multipartRecurso(req, res, next) {
     total += chunk.length;
     if (total > MAX_RECURSO_FILE_SIZE) {
       demasiadoGrande = true;
-      req.destroy();
       return;
     }
     chunks.push(chunk);
@@ -184,7 +184,7 @@ function multipartRecurso(req, res, next) {
 
   req.on('end', () => {
     if (demasiadoGrande) {
-      return res.status(413).json({ message: 'El archivo supera el limite de 50 MB' });
+      return res.status(413).json({ message: `El archivo supera el limite de ${MAX_RECURSO_FILE_SIZE_MB} MB` });
     }
 
     try {
@@ -199,7 +199,7 @@ function multipartRecurso(req, res, next) {
 
   req.on('error', () => {
     if (demasiadoGrande) {
-      return res.status(413).json({ message: 'El archivo supera el limite de 50 MB' });
+      return res.status(413).json({ message: `El archivo supera el limite de ${MAX_RECURSO_FILE_SIZE_MB} MB` });
     }
     res.status(400).json({ message: 'No se pudo recibir el archivo' });
   });
