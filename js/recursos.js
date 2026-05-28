@@ -1,10 +1,16 @@
 // ── ESTADO ───────────────────────────────────────────────────────────────
 let recursos = [];
 let recursoEditandoId = null;
+const MAX_RECURSO_FILE_SIZE_MB = 50;
+const MAX_RECURSO_FILE_SIZE = MAX_RECURSO_FILE_SIZE_MB * 1024 * 1024;
 
 function archivoValido(file) {
   const nombre = file.name.toLowerCase();
   return nombre.endsWith('.rar') || nombre.endsWith('.pdf');
+}
+
+function archivoDemasiadoGrande(file) {
+  return file.size > MAX_RECURSO_FILE_SIZE;
 }
 
 function normalizarRecursoCliente(recurso) {
@@ -177,6 +183,7 @@ document.getElementById('btnGuardarRecurso')?.addEventListener('click', async ()
   if (!titulo) return alert('El titulo es obligatorio');
   if (!esEdicion && !file) return alert('Selecciona un archivo .rar o PDF');
   if (file && !archivoValido(file)) return alert('Solo se pueden subir archivos .rar y PDF');
+  if (file && archivoDemasiadoGrande(file)) return alert(`El archivo no puede superar ${MAX_RECURSO_FILE_SIZE_MB} MB`);
 
   // Se pasa el File directamente, SoroAPI construye el FormData internamente
   const res = esEdicion

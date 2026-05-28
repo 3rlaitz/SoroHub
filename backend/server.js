@@ -13,7 +13,7 @@ const app = express();
 // Crea la carpeta de subidas si no existe
 const uploadsDir = path.join(__dirname, 'uploads');
 fs.mkdirSync(uploadsDir, { recursive: true });
-const MAX_RECURSO_FILE_SIZE_MB = 500;
+const MAX_RECURSO_FILE_SIZE_MB = 50;
 const MAX_RECURSO_FILE_SIZE = MAX_RECURSO_FILE_SIZE_MB * 1024 * 1024;
 
 // Middlewares básicos
@@ -94,115 +94,52 @@ function eliminarArchivoRecurso(archivoPath) {
   }
 }
 
-function obtenerBoundary(contentType) {
-  const match = String(contentType || '').match(/boundary=(?:"([^"]+)"|([^;]+))/);
-  return match?.[1] || match?.[2];
-}
-
-function dividirBuffer(buffer, separador) {
-  const partes = [];
-  let inicio = 0;
-  let indice = buffer.indexOf(separador, inicio);
-
-  while (indice !== -1) {
-    partes.push(buffer.subarray(inicio, indice));
-    inicio = indice + separador.length;
-    indice = buffer.indexOf(separador, inicio);
-  }
-
-  partes.push(buffer.subarray(inicio));
-  return partes;
-}
-
-function recortarSaltoLinea(buffer) {
-  let inicio = 0;
-  let fin = buffer.length;
-
-  if (buffer[inicio] === 13 && buffer[inicio + 1] === 10) inicio += 2;
-  if (buffer[fin - 2] === 13 && buffer[fin - 1] === 10) fin -= 2;
-
-  return buffer.subarray(inicio, fin);
-}
-
-function parsearMultipartBuffer(buffer, boundary) {
-  const resultado = { body: {}, file: null };
-  const separador = Buffer.from(`--${boundary}`);
-  const partes = dividirBuffer(buffer, separador);
-
-  for (const parteOriginal of partes) {
-    const parte = recortarSaltoLinea(parteOriginal);
-    if (!parte.length || parte.subarray(0, 2).toString() === '--') continue;
-
-    const headerEnd = parte.indexOf(Buffer.from('\r\n\r\n'));
-    if (headerEnd === -1) continue;
-
-    const headers = parte.subarray(0, headerEnd).toString('latin1');
-    const contenido = recortarSaltoLinea(parte.subarray(headerEnd + 4));
-    const disposition = headers.match(/content-disposition:\s*([^\r\n]+)/i)?.[1] || '';
-    const name = disposition.match(/name="([^"]+)"/i)?.[1];
-    const filename = disposition.match(/filename="([^"]*)"/i)?.[1];
-    const mimetype = headers.match(/content-type:\s*([^\r\n]+)/i)?.[1]?.trim() || 'application/octet-stream';
-
-    if (!name) continue;
-
-    if (filename) {
-      resultado.file = {
-        fieldname: name,
-        originalname: path.basename(filename),
-        mimetype,
-        buffer: contenido,
-        size: contenido.length,
-      };
-    } else {
-      resultado.body[name] = contenido.toString('utf8');
-    }
-  }
-
-  return resultado;
-}
-
-function multipartRecurso(req, res, next) {
+async function multipartRecurso(req, res, next) {
   if (!String(req.headers['content-type'] || '').includes('multipart/form-data')) {
     return next();
   }
 
-  const boundary = obtenerBoundary(req.headers['content-type']);
-  if (!boundary) return res.status(400).json({ message: 'Formulario de subida no valido' });
+  const contentLength = Number(req.headers['content-length'] || 0);
+  if (contentLength > MAX_RECURSO_FILE_SIZE) {
+    return res.status(413).json({ message: `El archivo supera el limite de ${MAX_RECURSO_FILE_SIZE_MB} MB` });
+  }
 
-  const chunks = [];
-  let total = 0;
-  let demasiadoGrande = false;
+  try {
+    const request = new Request('http://localhost/api/recursos', {
+      method: req.method,
+      headers: req.headers,
+      body: req,
+      duplex: 'half',
+    });
+    const formData = await request.formData();
+    const archivo = formData.get('archivo') || formData.get('file');
 
-  req.on('data', chunk => {
-    total += chunk.length;
-    if (total > MAX_RECURSO_FILE_SIZE) {
-      demasiadoGrande = true;
-      return;
+    req.body = {};
+    for (const [key, value] of formData.entries()) {
+      if (key !== 'archivo' && typeof value === 'string') {
+        req.body[key] = value;
+      }
     }
-    chunks.push(chunk);
-  });
 
-  req.on('end', () => {
-    if (demasiadoGrande) {
-      return res.status(413).json({ message: `El archivo supera el limite de ${MAX_RECURSO_FILE_SIZE_MB} MB` });
+    if (archivo && typeof archivo.arrayBuffer === 'function') {
+      if (archivo.size > MAX_RECURSO_FILE_SIZE) {
+        return res.status(413).json({ message: `El archivo supera el limite de ${MAX_RECURSO_FILE_SIZE_MB} MB` });
+      }
+
+      req.file = {
+        fieldname: 'archivo',
+        originalname: path.basename(archivo.name || ''),
+        mimetype: archivo.type || 'application/octet-stream',
+        buffer: Buffer.from(await archivo.arrayBuffer()),
+        size: archivo.size,
+      };
     }
 
-    try {
-      const multipart = parsearMultipartBuffer(Buffer.concat(chunks), boundary);
-      req.body = multipart.body;
-      req.file = multipart.file;
-      next();
-    } catch {
-      res.status(400).json({ message: 'No se pudo leer el formulario de subida' });
-    }
-  });
-
-  req.on('error', () => {
-    if (demasiadoGrande) {
-      return res.status(413).json({ message: `El archivo supera el limite de ${MAX_RECURSO_FILE_SIZE_MB} MB` });
-    }
+    next();
+  } catch (err) {
+    console.warn(`No se pudo leer el formulario de subida: ${err.message}`);
     res.status(400).json({ message: 'No se pudo recibir el archivo' });
-  });
+  }
 }
 
 asegurarColumnasRecursos();
