@@ -42,29 +42,12 @@ db.exec(`
     autor          TEXT,
     fecha          TEXT,
     nombre_archivo TEXT,
-    archivo_data   TEXT,
+    archivo_path   TEXT,
+    archivo_mime   TEXT,
+    archivo_size   INTEGER,
     comentarios    TEXT DEFAULT '[]'
   );
 `);
-
-// ── MIGRACIONES DE ESQUEMA ──
-// Añade nuevas columnas a tablas existentes para no perder datos
-
-const columnasTareas = db.prepare('PRAGMA table_info(tareas)').all().map(col => col.name);
-if (!columnasTareas.includes('tipo')) {
-  db.prepare("ALTER TABLE tareas ADD COLUMN tipo TEXT DEFAULT 'Tarea'").run();
-}
-
-const columnasRecursos = db.prepare('PRAGMA table_info(recursos)').all().map(col => col.name);
-if (!columnasRecursos.includes('archivo_path')) {
-  db.prepare('ALTER TABLE recursos ADD COLUMN archivo_path TEXT').run();
-}
-if (!columnasRecursos.includes('archivo_mime')) {
-  db.prepare('ALTER TABLE recursos ADD COLUMN archivo_mime TEXT').run();
-}
-if (!columnasRecursos.includes('archivo_size')) {
-  db.prepare('ALTER TABLE recursos ADD COLUMN archivo_size INTEGER').run();
-}
 
 // Exporta la instancia para usarla en el servidor
 module.exports = db;

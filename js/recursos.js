@@ -2,15 +2,6 @@
 let recursos = [];
 let recursoEditandoId = null;
 
-function leerArchivoComoDataURL(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
 function archivoValido(file) {
   const nombre = file.name.toLowerCase();
   return nombre.endsWith('.rar') || nombre.endsWith('.pdf');
@@ -96,21 +87,11 @@ async function agregarComentario(id) {
 // ── DESCARGA DE ARCHIVOS ─────────────────────────────────────────────────
 function descargarRecurso(id) {
   const r = recursos.find(x => x.id === id);
-  if (!r) return;
+  if (!r || !r.archivoUrl) return alert('Este recurso no tiene archivo disponible.');
 
-  if (r.archivoUrl) {
-    window.location.href = r.archivoUrl.startsWith('http')
-      ? r.archivoUrl
-      : `${SoroConfig.API_BASE_URL}${r.archivoUrl}`;
-    return;
-  }
-
-  const enlace = document.createElement('a');
-  enlace.href = r.archivoData;
-  enlace.download = r.nombreArchivo || `${r.titulo}.rar`;
-  document.body.appendChild(enlace);
-  enlace.click();
-  enlace.remove();
+  window.location.href = r.archivoUrl.startsWith('http')
+    ? r.archivoUrl
+    : `${SoroConfig.API_BASE_URL}${r.archivoUrl}`;
 }
 
 // ── GESTIÓN DEL MODAL ────────────────────────────────────────────────────
@@ -164,21 +145,11 @@ document.getElementById('btnGuardarRecurso')?.addEventListener('click', async ()
   if (!esEdicion && !file) return alert('Selecciona un archivo .rar o PDF');
   if (file && !archivoValido(file)) return alert('Solo se pueden subir archivos .rar y PDF');
 
-  let nombreArchivo;
-  let archivoData;
-
-  if (file) {
-    try {
-      nombreArchivo = file.name;
-      archivoData = await leerArchivoComoDataURL(file);
-    } catch {
-      return alert('No se pudo leer el archivo seleccionado');
-    }
-  }
-
+  // Se pasa el File directamente, SoroAPI construye el FormData internamente
   const res = esEdicion
-    ? await SoroAPI.recursos.update(recursoEditandoId, titulo, desc, nombreArchivo, archivoData)
-    : await SoroAPI.recursos.add(titulo, desc, nombreArchivo, archivoData);
+    ? await SoroAPI.recursos.update(recursoEditandoId, titulo, desc, file ?? null)
+    : await SoroAPI.recursos.add(titulo, desc, file);
+
   if (!res.ok) return alert(res.message || 'No se pudo publicar el recurso');
 
   if (esEdicion) {
