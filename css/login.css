@@ -9,6 +9,7 @@
     }
 
     /* ── FONDO ANIMADO ── */
+    /* Efecto de gradientes pulsantes detrás del formulario */
     .fondo-auth {
       flex: 1;
       display: flex;
@@ -40,6 +41,7 @@
     }
 
     /* ── TARJETA AUTH ── */
+    /* Contenedor principal que envuelve el formulario */
     .tarjeta-auth {
       position: relative;
       z-index: 1;
@@ -58,6 +60,7 @@
     }
 
     /* ── LOGO ── */
+    /* Logotipo superior de la tarjeta */
     .auth-logo {
       display: flex;
       align-items: center;
@@ -80,6 +83,7 @@
     }
 
     /* ── PESTAÑAS ── */
+    /* Selector entre Iniciar Sesión y Registro */
     .pestanas {
       display: flex;
       background: #0f172a;
@@ -108,6 +112,7 @@
     }
 
     /* ── FORMULARIO ── */
+    /* Estilos generales para los inputs y textos del formulario */
     .formulario { display: none; }
     .formulario.visible { display: block; animation: fadeIn 0.25s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -159,6 +164,7 @@
     }
 
     /* ── BOTÓN SUBMIT ── */
+    /* Botón principal de acción (Entrar / Registrar) */
     .boton-auth {
       width: 100%;
       padding: 13px;
@@ -181,6 +187,7 @@
     .boton-auth:active { transform: translateY(0); }
 
     /* ── MENSAJES ── */
+    /* Alertas de error o éxito al enviar el formulario */
     .mensaje {
       display: none;
       padding: 12px 16px;
@@ -194,6 +201,7 @@
     .mensaje.exito   { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.4); color: #4ade80;  display: block; }
 
     /* ── SEPARADOR ── */
+    /* Enlace inferior para cambiar entre login y registro */
     .cambio-modo {
       text-align: center;
       margin-top: 20px;

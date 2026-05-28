@@ -1,3 +1,4 @@
+// ── IMPORTACIONES ──
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
@@ -7,12 +8,17 @@ const bcrypt = require('bcrypt')
 const path = require('path');
 const fs = require('fs');
 
+// ── CONFIGURACIÓN DEL SERVIDOR ──
 const app = express();
+// Crea la carpeta de subidas si no existe
 const uploadsDir = path.join(__dirname, 'uploads');
 fs.mkdirSync(uploadsDir, { recursive: true });
 
+// Middlewares básicos
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: '50mb' }));
+
+// Configura las sesiones en SQLite
 app.use(session({
   store: new SQLiteStore({ db: 'sessions.db' , dir: __dirname}),
   secret: 'sorohub_secret_2026',
@@ -20,13 +26,18 @@ app.use(session({
   saveUninitialized: false,
 }));
 
+// Sirve los archivos estáticos de la app
 app.use(express.static(path.join(__dirname, '..')));
 
+// ── HELPERS DE ARCHIVOS ──
+
+// Valida que solo suban RAR o PDF
 function extensionPermitida(nombreArchivo) {
   const nombre = String(nombreArchivo || '').toLowerCase();
   return nombre.endsWith('.rar') || nombre.endsWith('.pdf');
 }
 
+// Extrae los bytes de un archivo en Base64
 function extraerArchivoData(archivoData) {
   const match = String(archivoData || '').match(/^data:([^;]+);base64,(.+)$/);
   if (!match) {
@@ -37,11 +48,13 @@ function extraerArchivoData(archivoData) {
   return { mime: match[1], buffer };
 }
 
+// Genera un nombre único para evitar colisiones
 function nombreArchivoSeguro(id, nombreArchivo) {
   const extension = path.extname(nombreArchivo || '').toLowerCase();
   return `recurso-${id}${extension}`;
 }
 
+// Guarda un archivo en disco y devuelve sus datos
 function guardarArchivoRecurso(id, nombreArchivo, archivoData) {
   const { mime, buffer } = extraerArchivoData(archivoData);
   const filename = nombreArchivoSeguro(id, nombreArchivo);
@@ -55,6 +68,7 @@ function guardarArchivoRecurso(id, nombreArchivo, archivoData) {
   };
 }
 
+// Valida que no intenten acceder a rutas peligrosas
 function rutaArchivoAbsoluta(archivoPath) {
   const absolutePath = path.resolve(__dirname, archivoPath || '');
   if (!absolutePath.startsWith(uploadsDir)) {
@@ -63,6 +77,8 @@ function rutaArchivoAbsoluta(archivoPath) {
   return absolutePath;
 }
 
+// ── MIGRACIONES ──
+// Mueve los archivos viejos (guardados en Base64) al disco duro
 function migrarRecursosBase64() {
   const pendientes = db.prepare(`
     SELECT id, nombre_archivo, archivo_data
@@ -91,6 +107,8 @@ function migrarRecursosBase64() {
 
 migrarRecursosBase64();
 
+// ── MIDDLEWARE AUTENTICACIÓN ──
+// Protege las rutas que requieren inicio de sesión
 function requireAuth(req, res, next) {
   if (!req.session.user) {
     return res.status(401).json({ message: 'Debes iniciar sesion' });
@@ -100,6 +118,7 @@ function requireAuth(req, res, next) {
 
 // ── AUTH ────────────────────────────────────────────────────────────────
 
+// Registro de usuario nuevo
 app.post('/api/auth/register', async (req, res) => {
   const { nombre, apellidos, email, password } = req.body;
   const existe = db.prepare('SELECT id FROM usuarios WHERE email = ?').get(email);
@@ -116,6 +135,7 @@ app.post('/api/auth/register', async (req, res) => {
   res.json({ ok: true, user });
 });
 
+// Inicio de sesión
 app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body;
   const user = db.prepare('SELECT * FROM usuarios WHERE email = ?').get(email);
@@ -129,6 +149,7 @@ app.post('/api/auth/login', async (req, res) => {
   res.json({ ok: true, user: safe });
 });
 
+// Cerrar sesión
 app.post('/api/auth/logout', (req, res) => {
   req.session.destroy();
   res.json({ ok: true });
@@ -136,11 +157,13 @@ app.post('/api/auth/logout', (req, res) => {
 
 // ── NOTAS ───────────────────────────────────────────────────────────────
 
+// Obtener todas las notas del usuario logueado
 app.get('/api/notas', requireAuth, (req, res) => {
   const notas = db.prepare('SELECT * FROM notas WHERE user_id = ?').all(req.session.user.id);
   res.json({ notas });
 });
 
+// Añadir una nueva nota
 app.post('/api/notas', requireAuth, (req, res) => {
   const { asignatura, evaluacion, fecha, nota } = req.body;
   const result = db.prepare(
@@ -149,6 +172,7 @@ app.post('/api/notas', requireAuth, (req, res) => {
   res.json({ nota: { id: result.lastInsertRowid, asignatura, evaluacion, fecha, nota } });
 });
 
+// Eliminar una nota existente
 app.delete('/api/notas/:id', requireAuth, (req, res) => {
   db.prepare('DELETE FROM notas WHERE id = ? AND user_id = ?').run(req.params.id, req.session.user.id);
   res.json({ ok: true });
@@ -156,11 +180,13 @@ app.delete('/api/notas/:id', requireAuth, (req, res) => {
 
 // ── TAREAS ──────────────────────────────────────────────────────────────
 
+// Obtener lista de tareas
 app.get('/api/tareas', requireAuth, (req, res) => {
   const tareas = db.prepare('SELECT * FROM tareas WHERE user_id = ?').all(req.session.user.id);
   res.json({ tareas });
 });
 
+// Crear una nueva tarea
 app.post('/api/tareas', requireAuth, (req, res) => {
   const user = req.session.user;
   const { tipo, nombre, asignatura, fecha, estado } = req.body;
@@ -184,6 +210,7 @@ app.post('/api/tareas', requireAuth, (req, res) => {
   res.json({ tarea: { id: result.lastInsertRowid, ...tarea } });
 });
 
+// Actualizar una tarea (p.ej. cambiar estado)
 app.put('/api/tareas/:id', requireAuth, (req, res) => {
   const user = req.session.user;
   const { tipo, nombre, asignatura, fecha, estado } = req.body;
@@ -201,6 +228,7 @@ app.put('/api/tareas/:id', requireAuth, (req, res) => {
   res.json({ tarea: { id: Number(req.params.id), tipo: tipo || 'Tarea', nombre, asignatura: asignatura || '', fecha, estado: estado || 'Pendiente' } });
 });
 
+// Borrar una tarea
 app.delete('/api/tareas/:id', requireAuth, (req, res) => {
   const user = req.session.user;
   if (!user) return res.status(401).json({ message: 'Debes iniciar sesión' });
@@ -211,6 +239,7 @@ app.delete('/api/tareas/:id', requireAuth, (req, res) => {
 
 // ── RECURSOS ─────────────────────────────────────────────────────────────
 
+// Normaliza los datos de un recurso para enviarlo al cliente
 function normalizarRecurso(r, user) {
   return {
     id: r.id,
@@ -225,12 +254,14 @@ function normalizarRecurso(r, user) {
   };
 }
 
+// Listar todos los recursos
 app.get('/api/recursos', (req, res) => {
   const recursos = db.prepare('SELECT * FROM recursos ORDER BY id ASC').all()
     .map(r => normalizarRecurso(r, req.session.user));
   res.json({ recursos });
 });
 
+// Subir un nuevo recurso
 app.post('/api/recursos', (req, res) => {
   const { titulo, desc, nombreArchivo, archivoData } = req.body;
   const user = req.session.user;
@@ -278,12 +309,13 @@ app.post('/api/recursos', (req, res) => {
   });
 });
 
+// Actualizar un recurso
 app.put('/api/recursos/:id', (req, res) => {
   const user = req.session.user;
   const { titulo, desc, nombreArchivo, archivoData } = req.body;
 
-  if (!user) return res.status(401).json({ message: 'Debes iniciar sesiÃ³n' });
-  if (!titulo?.trim()) return res.status(400).json({ message: 'El tÃ­tulo es obligatorio' });
+  if (!user) return res.status(401).json({ message: 'Debes iniciar sesión' });
+  if (!titulo?.trim()) return res.status(400).json({ message: 'El título es obligatorio' });
 
   const recurso = db.prepare('SELECT * FROM recursos WHERE id = ?').get(req.params.id);
   if (!recurso) return res.status(404).json({ message: 'Recurso no encontrado' });
@@ -330,6 +362,7 @@ app.put('/api/recursos/:id', (req, res) => {
   res.json({ recurso: normalizarRecurso(actualizado, user) });
 });
 
+// Descargar un recurso
 app.get('/api/recursos/:id/descargar', (req, res) => {
   const recurso = db.prepare('SELECT * FROM recursos WHERE id = ?').get(req.params.id);
   if (!recurso) return res.status(404).json({ message: 'Recurso no encontrado' });
@@ -352,9 +385,10 @@ app.get('/api/recursos/:id/descargar', (req, res) => {
   res.status(404).json({ message: 'Archivo no encontrado' });
 });
 
+// Borrar un recurso
 app.delete('/api/recursos/:id', (req, res) => {
   const user = req.session.user;
-  if (!user) return res.status(401).json({ message: 'Debes iniciar sesiÃ³n' });
+  if (!user) return res.status(401).json({ message: 'Debes iniciar sesión' });
 
   const result = db.prepare('DELETE FROM recursos WHERE id = ? AND user_id = ?').run(req.params.id, user.id);
   if (result.changes === 0) {
@@ -364,6 +398,7 @@ app.delete('/api/recursos/:id', (req, res) => {
   res.json({ ok: true });
 });
 
+// Añadir comentario a un recurso
 app.post('/api/recursos/:id/comentarios', (req, res) => {
   const user = req.session.user;
   const { texto } = req.body;
@@ -382,4 +417,5 @@ app.post('/api/recursos/:id/comentarios', (req, res) => {
   res.json({ comentario });
 });
 
+// Arranca el servidor
 app.listen(3000, () => console.log('SoroHub backend corriendo en http://localhost:3000'));

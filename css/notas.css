@@ -1,6 +1,7 @@
     body { font-family: 'Inter', Arial, sans-serif; }
 
     /* ── HERO ── */
+    /* Encabezado principal con título y estadísticas rápidas */
     .hero-notas {
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0c2a3e 100%);
       padding: 60px 50px 40px;
@@ -61,6 +62,7 @@
     }
 
     /* ── CONTROLES ── */
+    /* Barra de filtros, ordenación y botón de añadir nota */
     .controles-notas {
       display: flex;
       align-items: center;
@@ -124,6 +126,7 @@
     .boton-nueva-nota:hover { background: #0284c7; transform: translateY(-1px); }
 
     /* ── TABLA ── */
+    /* Contenedor y estilos de la tabla que muestra el listado de notas */
     .contenedor-tabla {
       padding: 0 50px 50px;
       background: #0f172a;
@@ -225,6 +228,7 @@
     .sin-notas span { font-size: 3rem; display: block; margin-bottom: 12px; }
 
     /* ── MODAL ── */
+    /* Ventana superpuesta para crear y registrar una nueva nota */
     .overlay-modal {
       display: none;
       position: fixed;

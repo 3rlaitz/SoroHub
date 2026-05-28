@@ -1,8 +1,8 @@
-  // ── Estado local (caché de notas cargadas desde SoroAPI) ────────────────
+  // ── ESTADO LOCAL ─────────────────────────────────────────────────────────
   let notas = [];
   let filtroActual = 'todas';
 
-  // ── Utilidades ───────────────────────────────────────────────────────────
+  // ── UTILIDADES ───────────────────────────────────────────────────────────
   function claseBadge(asig) {
     if (!asig) asig = "Otros";
     const charCode = asig.charCodeAt(0) || 0;
@@ -24,7 +24,7 @@
     return `${d}/${m}/${y}`;
   }
 
-  // ── Renderizado ──────────────────────────────────────────────────────────
+  // ── RENDERIZADO ──────────────────────────────────────────────────────────
   function renderizar() {
     const orden = document.getElementById('selectOrden').value;
     let datos = [...notas];
@@ -68,17 +68,17 @@
     document.getElementById('stat-mejor').textContent = mejor;
   }
 
-  // ── Orden ──────────────────────────────────────────────────────
+  // ── ORDENACIÓN ───────────────────────────────────────────────────────────
   document.getElementById('selectOrden').addEventListener('change', renderizar);
 
-  // ── Eliminar nota ────────────────────────────────────────────────────────
+  // ── ELIMINAR NOTA ────────────────────────────────────────────────────────
   async function eliminar(id) {
     await SoroAPI.notas.delete(id);
     notas = notas.filter(n => n.id !== id);
     renderizar();
   }
 
-  // ── Modal ────────────────────────────────────────────────────────────────
+  // ── GESTIÓN DEL MODAL ────────────────────────────────────────────────────
   const overlay = document.getElementById('overlayModal');
   document.getElementById('btnNuevaNota').addEventListener('click', () => {
     document.getElementById('inputFecha').value = new Date().toISOString().slice(0,10);
@@ -108,13 +108,13 @@
     }
   });
 
-  // ── Nombre del alumno en el hero ─────────────────────────────────────────
+  // ── NOMBRE DEL ALUMNO EN EL HERO ─────────────────────────────────────────
   const sesion = SoroAPI.auth.getSession();
   if (sesion) {
     document.getElementById('nombre-alumno').textContent = sesion.nombre + ' ' + sesion.apellidos;
   }
 
-  // ── Inicializar: carga notas desde SoroAPI ───────────────────────────────
+  // ── INICIALIZACIÓN ───────────────────────────────────────────────────────
   (async function init() {
     if (!SoroAuth.requerirSesion()) return;
 

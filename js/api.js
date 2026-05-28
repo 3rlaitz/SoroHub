@@ -1,19 +1,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 //  SOROHUB – CAPA DE API
-//  Centraliza TODAS las llamadas a datos de la aplicación.
-//
-//  ┌─────────────────────────────────────────────────────────────────────┐
-//  │  CÓMO CONECTAR LA BASE DE DATOS (pasos para el compañero)           │
-//  │                                                                     │
-//  │  1. Abre config.js y pon:  USE_MOCK: false                          │
-//  │  2. En config.js ajusta:   API_BASE_URL a la URL de tu servidor     │
-//  │  3. Aquí, descomenta los bloques [REAL API] de cada función         │
-//  │  4. Comenta (o elimina) los bloques [MOCK] correspondientes         │
-//  │                                                                     │
-//  │  Los endpoints esperados se documentan en cada función.             │
-//  └─────────────────────────────────────────────────────────────────────┘
-//
-//  Depende de: config.js  (debe cargarse antes que este archivo)
+//  Centraliza todas las llamadas a datos (modo Mock o API Real).
+//  Depende de: config.js (debe cargarse antes)
 // ═══════════════════════════════════════════════════════════════════════════
 
 const SoroAPI = (() => {
@@ -37,14 +25,14 @@ const SoroAPI = (() => {
   function mockDel(key)      { sessionStorage.removeItem(key); }
 
   // ── Helper de fetch para la API real ───────────────────────────────────
-  // Añade cabeceras JSON y gestiona errores HTTP.
+  // Añade cabeceras JSON y gestiona errores HTTP
   async function fetchJSON(endpoint, options = {}) {
     const res = await fetch(BASE + endpoint, {
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
       },
-      credentials: 'include',   // envía cookies de sesión (si el servidor las usa)
+      credentials: 'include', // Envía cookies de sesión
       ...options,
     });
     if (!res.ok) {
@@ -56,10 +44,6 @@ const SoroAPI = (() => {
 
   // ═══════════════════════════════════════════════════════════════════════
   //  AUTH
-  //  Rutas esperadas en el servidor:
-  //    POST /api/auth/login    { email, password }  → { ok, user }
-  //    POST /api/auth/register { nombre, apellidos, email, password } → { ok, user }
-  //    POST /api/auth/logout   (sin body)           → { ok }
   // ═══════════════════════════════════════════════════════════════════════
   const auth = {
 
@@ -137,9 +121,7 @@ const SoroAPI = (() => {
       // ── [REAL API] ───────────────────────────────────────────────────────
     },
 
-    // Devuelve el usuario en sesión desde la caché local (síncrono).
-    // En modo real la sesión viene del servidor, pero la cacheamos en
-    // localStorage para no hacer un fetch extra en cada carga de página.
+    // Devuelve el usuario activo en sesión (síncrono)
     getSession() {
       return mockGet(KEYS.session, null);
     },
@@ -147,10 +129,6 @@ const SoroAPI = (() => {
 
   // ═══════════════════════════════════════════════════════════════════════
   //  NOTAS
-  //  Rutas esperadas en el servidor:
-  //    GET    /api/notas        → { notas: [...] }
-  //    POST   /api/notas        { asignatura, evaluacion, fecha, nota } → { nota }
-  //    DELETE /api/notas/:id    → { ok }
   // ═══════════════════════════════════════════════════════════════════════
   const NOTAS_DEFAULT = [
     { id: 1, asignatura: 'Matemáticas', evaluacion: 'Examen Álgebra',           fecha: '2026-04-10', nota: 8.5 },
@@ -223,11 +201,7 @@ const SoroAPI = (() => {
   };
 
   // ═══════════════════════════════════════════════════════════════════════
-  //  CURSOS  (stub — pendiente de implementar)
-  //  Rutas esperadas:
-  //    GET /api/cursos              → { cursos: [...] }
-  //    GET /api/cursos/:id          → { curso }
-  //    POST /api/cursos/:id/matricular → { ok }
+  //  CURSOS
   // ═══════════════════════════════════════════════════════════════════════
   const cursos = {
     async getAll() {
@@ -240,10 +214,7 @@ const SoroAPI = (() => {
   };
 
   // ═══════════════════════════════════════════════════════════════════════
-  //  TAREAS  (stub — pendiente de implementar)
-  //  Rutas esperadas:
-  //    GET  /api/tareas              → { tareas: [...] }
-  //    POST /api/tareas/:id/entregar → { ok }
+  //  TAREAS
   // ═══════════════════════════════════════════════════════════════════════
   const TAREAS_DEFAULT = [
     { id: 1, nombre: 'Ejercicios de Álgebra', asignatura: 'Matemáticas', fecha: '2026-05-18', estado: 'Pendiente' },
@@ -270,8 +241,6 @@ const SoroAPI = (() => {
       }
       const guardadas = await Promise.all(lista.map(t => this.update(t.id, t)));
       return { ok: guardadas.every(r => r.ok) };
-      // Este método es un helper para el MOCK.
-      // En la API real se usarían endpoints individuales para añadir/editar/eliminar.
     },
     async add(tarea) {
       if (MOCK) {
@@ -325,6 +294,9 @@ const SoroAPI = (() => {
     }
   };
 
+  // ═══════════════════════════════════════════════════════════════════════
+  //  RECURSOS
+  // ═══════════════════════════════════════════════════════════════════════
   const recursos = {
     async getAll() {
       const data = await fetchJSON('/recursos');

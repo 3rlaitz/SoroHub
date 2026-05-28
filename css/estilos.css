@@ -1,4 +1,4 @@
-/*COLORES - PÁGINA WEB*/
+/* ── COLORES - PÁGINA WEB ── */
 :root {
   --color-primario: #0ea5e9;
   --color-oscuro: #0f172a;
@@ -8,7 +8,7 @@
   --sombra: 0 10px 25px rgba(0,0,0,0.2);
 }
 
-/*REINICIO DE ESTILOS*/
+/* ── REINICIO DE ESTILOS ── */
 * {
   margin: 0;
   padding: 0;
@@ -16,13 +16,13 @@
   font-family: Arial, sans-serif;
 }
 
-/*BODY*/
+/* ── BODY ── */
 body {
   background: var(--color-oscuro);
   color: var(--color-texto);
 }
 
-/*BARRA SUPERIOR*/
+/* ── BARRA SUPERIOR ── */
 .barra-superior {
   display: flex;
   justify-content: space-between;
@@ -34,7 +34,7 @@ body {
   z-index: 100;
 }
 
-/* LOGO - SOROHUB*/
+/* ── LOGO - SOROHUB ── */
 .contenedor-logo {
   display: flex;
   align-items: center;
@@ -52,7 +52,7 @@ body {
   color: var(--color-claro);
 }
 
-/*NAVEGACIÓN*/
+/* ── NAVEGACIÓN ── */
 .navegacion a {
   margin: 0 10px;
   text-decoration: none;
@@ -64,7 +64,7 @@ body {
   color: var(--color-primario);
 }
 
-/*BOTONES*/
+/* ── BOTONES ── */
 .boton {
   padding: 10px 15px;
   border-radius: 8px;
@@ -93,7 +93,7 @@ body {
   color: var(--color-oscuro);
 }
 
-/* BOTÓN CERRAR SESIÓN */
+/* ── BOTÓN CERRAR SESIÓN ── */
 #btnCerrarSesion {
   color: var(--color-primario);
   border-color: var(--color-primario);
@@ -105,7 +105,7 @@ body {
   color: white;
 }
 
-/*SALUDO USUARIO LOGUEADO*/
+/* ── SALUDO USUARIO LOGUEADO ── */
 .saludo-usuario {
   font-size: 0.88rem;
   color: var(--color-texto);
@@ -118,7 +118,7 @@ body {
   color: var(--color-primario);
 }
 
-/*SECCIÓN PRINCIPAL*/
+/* ── SECCIÓN PRINCIPAL (HERO) ── */
 .seccion-hero {
   height: 70vh;
   display: flex;
@@ -314,7 +314,7 @@ body {
   border: 3px solid var(--color-primario);
 }
 
-/*PÁGINA EN DESARROLLO*/
+/* ── PÁGINA EN DESARROLLO ── */
 .seccion-estado {
   height: 80vh;
   display: flex;
@@ -342,7 +342,7 @@ body {
   margin-bottom: 15px;
 }
 
-/*FOOTER*/
+/* ── FOOTER ── */
 .pie-pagina {
   text-align: center;
   padding: 20px;

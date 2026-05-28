@@ -1,4 +1,4 @@
-// ESTADO
+// ── ESTADO ───────────────────────────────────────────────────────────────
 let recursos = [];
 let recursoEditandoId = null;
 
@@ -16,7 +16,7 @@ function archivoValido(file) {
   return nombre.endsWith('.rar') || nombre.endsWith('.pdf');
 }
 
-// INIT
+// ── INICIALIZACIÓN ───────────────────────────────────────────────────────
 async function init() {
   const inputFile = document.getElementById('inputFile');
   if (inputFile) inputFile.accept = '.rar,.pdf';
@@ -31,7 +31,7 @@ async function init() {
   SoroAuth.requerirSesion();
 }
 
-// RENDER
+// ── RENDERIZADO DE RECURSOS ──────────────────────────────────────────────
 function renderRecursos() {
   const cont = document.getElementById('gridRecursos');
   if (recursos.length === 0) {
@@ -76,7 +76,7 @@ function renderRecursos() {
   `).join('');
 }
 
-// COMENTARIOS
+// ── COMENTARIOS ──────────────────────────────────────────────────────────
 async function agregarComentario(id) {
   const input = document.getElementById(`inputComentario_${id}`);
   const texto = input.value.trim();
@@ -93,7 +93,7 @@ async function agregarComentario(id) {
   }
 }
 
-// DESCARGA
+// ── DESCARGA DE ARCHIVOS ─────────────────────────────────────────────────
 function descargarRecurso(id) {
   const r = recursos.find(x => x.id === id);
   if (!r) return;
@@ -113,7 +113,7 @@ function descargarRecurso(id) {
   enlace.remove();
 }
 
-// MODAL
+// ── GESTIÓN DEL MODAL ────────────────────────────────────────────────────
 const modalSubir = document.getElementById('modalSubir');
 
 function abrirModalNuevo() {

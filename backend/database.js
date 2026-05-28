@@ -1,8 +1,11 @@
+// ── CONFIGURACIÓN DE BASE DE DATOS ──
+// Inicializa la conexión con SQLite
 const Database = require('better-sqlite3');
 const path = require('path');
 
 const db = new Database(path.join(__dirname, 'sorohub.db'));
 
+// Crea las tablas principales si no existen
 db.exec(`
   CREATE TABLE IF NOT EXISTS usuarios (
     id       INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,6 +47,9 @@ db.exec(`
   );
 `);
 
+// ── MIGRACIONES DE ESQUEMA ──
+// Añade nuevas columnas a tablas existentes para no perder datos
+
 const columnasTareas = db.prepare('PRAGMA table_info(tareas)').all().map(col => col.name);
 if (!columnasTareas.includes('tipo')) {
   db.prepare("ALTER TABLE tareas ADD COLUMN tipo TEXT DEFAULT 'Tarea'").run();
@@ -60,4 +66,5 @@ if (!columnasRecursos.includes('archivo_size')) {
   db.prepare('ALTER TABLE recursos ADD COLUMN archivo_size INTEGER').run();
 }
 
+// Exporta la instancia para usarla en el servidor
 module.exports = db;
