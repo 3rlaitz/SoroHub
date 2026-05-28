@@ -4,6 +4,7 @@ const Database = require('better-sqlite3');
 const path = require('path');
 
 const db = new Database(path.join(__dirname, 'sorohub.db'));
+db.pragma('foreign_keys = ON');
 
 // Crea las tablas principales si no existen
 db.exec(`
@@ -21,7 +22,8 @@ db.exec(`
     asignatura TEXT,
     evaluacion TEXT,
     fecha      TEXT,
-    nota       REAL
+    nota       REAL,
+    FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE
   );
 
   CREATE TABLE IF NOT EXISTS tareas (
@@ -31,7 +33,8 @@ db.exec(`
     nombre     TEXT,
     asignatura TEXT,
     fecha      TEXT,
-    estado     TEXT
+    estado     TEXT,
+    FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE
   );
 
   CREATE TABLE IF NOT EXISTS recursos (
@@ -45,7 +48,8 @@ db.exec(`
     archivo_path   TEXT,
     archivo_mime   TEXT,
     archivo_size   INTEGER,
-    comentarios    TEXT DEFAULT '[]'
+    comentarios    TEXT DEFAULT '[]',
+    FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE
   );
 `);
 
