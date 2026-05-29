@@ -108,7 +108,7 @@ SoroHub/
 | Autor | GitHub |
 |---|---|
 | Erlaitz Alonso | [@3rlaitz](https://github.com/3rlaitz) |
-| Eneko Martin | — |
-| Arkaitz Jimenez | — |
+| Eneko Martin | [@enekoo8](https://github.com/enekoo8) |
+| Arkaitz Jimenez | [@Arkaaiiitz](https://github.com/Arkaaiiitz) |
 
 Centro Formación Somorrostro · 2025-2026
